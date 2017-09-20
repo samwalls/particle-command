@@ -1,6 +1,6 @@
 public class PhysicsComponent {
   
-  private PVector position = new PVector();
+  private Transform transform;
   private PVector velocity = new PVector();
   private PVector acceleration = new PVector();
   
@@ -10,18 +10,23 @@ public class PhysicsComponent {
   
   private boolean integrated = true;
   
+  public PhysicsComponent(Transform transform) {
+    this.transform = transform;
+  }
+  
   public void integrate() {
     if (isKinematic && !integrated) {
-      position.add(velocity);
+      transform.position.add(velocity);
       velocity.add(acceleration);
       integrated = true;
     }
   }
   
-  public void applyForce(PVector f, ForceType type) {
-    if (f == null) {
+  public void applyForce(PVector force, ForceType type) {
+    if (force == null) {
       return;
     }
+    PVector f = new PVector(force.x, force.y);
     if (integrated) {
       acceleration.x = 0;
       acceleration.y = 0;
@@ -48,20 +53,29 @@ public class PhysicsComponent {
   }
   
   public PVector getPosition() {
-    return position;    
+    return new PVector(transform.position.x, transform.position.y);    
   }
   
   public void setPosition(PVector position) {
-    if (position != null)
-      this.position = position;
+    if (position == null)
+      return;
+    transform.position.x = position.x;
+    transform.position.y = position.y;
   }
   
   public PVector getVelocity() {
-    return velocity;
+    return new PVector(velocity.x, velocity.y);
+  }
+  
+  public void setVelocity(PVector v) {
+    if (v == null)
+      return;
+    velocity.x = v.x;
+    velocity.y = v.y;
   }
   
   public PVector getAcceleration() {
-    // acceleration is not modifiable, create new vector
+    // acceleration is read-only, create new vector
     return new PVector(acceleration.x, acceleration.y);
   }
   

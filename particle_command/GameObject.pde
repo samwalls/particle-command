@@ -1,9 +1,13 @@
-private class GameObject extends PhysicsComponent {
+private class GameObject implements Drawable, Updatable {
   
   private static final int MAX_SIZE = 50;
   
   private static final int TRAIL_PERIOD = 1;
   private static final int TRAIL_MAX = 50;
+  
+  private Transform transform = new Transform();
+  
+  private PhysicsComponent physics;
   
   private int trailFrameCounter = 0;
   
@@ -13,12 +17,16 @@ private class GameObject extends PhysicsComponent {
   
   public GameObject() {
     super();
+    physics = new PhysicsComponent(transform);
   }
   
-  protected void update() {}
+  @Override
+  public void update() {}
   
+  @Override
   public void render() {
-    PVector p = getPosition();
+    pushMatrix();
+    PVector p = physics().getPosition();
     float size = size();
     fill(colour.x, colour.y, colour.z);
     if (++trailFrameCounter % TRAIL_PERIOD == 0) {
@@ -32,16 +40,13 @@ private class GameObject extends PhysicsComponent {
     stroke(0);
     strokeWeight(1);
     float radius = size / 2;
-    quad(
-      p.x - radius, p.y - radius,
-      p.x - radius, p.y + radius,
-      p.x + radius, p.y + radius,
-      p.x + radius, p.y - radius
-    );
+    ellipse(p.x, p.y, radius * 2, radius * 2);
+    rotate(transform.rotation);
+    popMatrix();
   }
   
   protected void renderRelativeLine(PVector v) {
-    line(getPosition().x, getPosition().y, getPosition().x + v.x, getPosition().y + v.y);
+    line(physics().getPosition().x, physics().getPosition().y, physics().getPosition().x + v.x, physics().getPosition().y + v.y);
   }
   
   private void renderTrail() {
@@ -54,7 +59,7 @@ private class GameObject extends PhysicsComponent {
           PVector strokeColour = new PVector(colour.x, colour.y, colour.z);
           strokeColour.mult(5f/i);
           stroke(strokeColour.x, strokeColour.y, strokeColour.z);
-          float trailWidth = 0.8 * (size() - getVelocity().mag() * (i / size()));
+          float trailWidth = 0.8 * (size() - physics().getVelocity().mag() * (i / size()));
           strokeWeight(trailWidth >= 0 ? trailWidth : 0);
           line(a.x, a.y, b.x, b.y);
         }
@@ -66,6 +71,11 @@ private class GameObject extends PhysicsComponent {
   
   // public property based on the mass of the object
   public float size() {
-    return max(1, min(getMass(), MAX_SIZE));
+    return max(1, min(physics().getMass(), MAX_SIZE));
+  }
+  
+  // public access to this object's physics
+  public PhysicsComponent physics() {
+    return physics;
   }
 }

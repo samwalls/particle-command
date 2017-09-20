@@ -1,18 +1,18 @@
 import java.util.ArrayDeque;
 
 void setup() {
-  //fullScreen(SPAN);
-  size(1940, 1080);
+  fullScreen();
+  //size(1940, 1080);
   
-  GravityObject star = new GravityObject(1000f);
-  star.setKinematic(false);
-  star.setPosition(new PVector(width/2, height/2));
+  GravityObject star = new GravityObject(1000000f);
+  star.physics().setKinematic(false);
+  star.physics().setPosition(new PVector(width/2, height/2));
   gameObjects.add(star);
   gravityObjects.add(star);
 }
 
 static final float MASS_MIN = 0.01;
-static final float MASS_MAX = 5;
+static final float MASS_MAX = 10;
 
 ArrayList<GameObject> gameObjects = new ArrayList();
 ArrayList<GravityObject> gravityObjects = new ArrayList();
@@ -26,9 +26,9 @@ void mousePressed() {
 
 void mouseReleased() {
   GravityObject g = new GravityObject(random(MASS_MIN, MASS_MAX));
-  g.setPosition(new PVector(mouseX, mouseY));
+  g.physics().setPosition(new PVector(mousePressX, mousePressY));
   // make the object move with respect to the change in position since mouse press
-  g.applyForce(new PVector(mouseX - mousePressX, mouseY - mousePressY).mult(0.1), ForceType.VELOCITY);
+  g.physics().applyForce(new PVector(mouseX - mousePressX, mouseY - mousePressY).mult(0.01), ForceType.VELOCITY);
   g.setInteractiveObjects(gravityObjects);
   gameObjects.add(g);
   gravityObjects.add(g);
@@ -39,7 +39,7 @@ void draw() {
   for (GameObject g : gameObjects) {
     g.update();
     // apply physics updates
-    g.integrate();
+    g.physics().integrate();
     // render changes
     g.render();
   }
