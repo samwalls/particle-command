@@ -9,4 +9,12 @@ public class GameManager {
   public ArrayList<GameObject> gameObjects() {
     return gameObjects;
   }
+  
+  public void updateAll() {
+    for (GameObject g : gameObjects) {
+      g.update();
+      g.physics().integrate();
+      g.render();
+    }
+  }
 }

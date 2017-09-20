@@ -30,14 +30,10 @@ void mouseReleased() {
 }
 
 void draw() {
+  // clear
   background(0, 0, 0);
-  for (GameObject g : game.gameObjects()) {
-    g.update();
-    // apply physics updates
-    g.physics().integrate();
-    // render changes
-    g.render();
-  }
+  // update, render
+  game.updateAll();
 }
 
 public void initStar() {
