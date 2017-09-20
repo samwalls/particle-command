@@ -36,15 +36,19 @@ public class PhysicsComponent {
       case FORCE:
         // applying acceleration via force
         acceleration.add(f.div(mass));
+        break;
       case ACCELERATION:
         // add acceleration
         acceleration.add(f);
+        break;
       case IMPULSE:
         // instantaneous change in momentum as f, results in a change in velocity dependant on f and the mass
         velocity.add(f.div(mass));
+        break;
       case VELOCITY:
         // add velocity
-        velocity.add(f);      
+        velocity.add(f);
+        break;
     }
   }
   
