@@ -15,23 +15,26 @@ public class PhysicsComponent {
   }
   
   public void integrate() {
-    if (isKinematic && !integrated) {
-      transform.position.add(velocity);
+    if (isKinematic) {
+      // we're using "semi-implicit Euler integration" here
+      // i.e. it's important to integrate the velocity before we integrate the position
+      // https://gafferongames.com/post/integration_basics/
       velocity.add(acceleration);
+      transform.position.add(velocity);
       integrated = true;
     }
   }
   
   public void applyForce(PVector force, ForceType type) {
-    if (force == null) {
+    if (force == null || !isKinematic) {
       return;
     }
-    PVector f = new PVector(force.x, force.y);
     if (integrated) {
+      integrated = false;
       acceleration.x = 0;
       acceleration.y = 0;
-      integrated = false;
     }
+    PVector f = new PVector(force.x, force.y);
     switch(type) {
       case FORCE:
         // applying acceleration via force
