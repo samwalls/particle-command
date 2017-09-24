@@ -5,6 +5,7 @@ public class PhysicsComponent {
   private PVector acceleration = new PVector();
   
   private float mass = 0;
+  private float inverseMass = Float.POSITIVE_INFINITY;
   
   private boolean isKinematic = true;
   
@@ -92,6 +93,30 @@ public class PhysicsComponent {
   
   public void setMass(float mass) {
     this.mass = mass;
+    if (mass == 0f) {
+      this.inverseMass = Float.POSITIVE_INFINITY;
+    } else {
+      this.inverseMass = 1 / mass;
+    }
+  }
+  
+  public float getInverseMass() {
+    return inverseMass;
+  }
+  
+  public void setInverseMass(float inverseMass) {
+    this.inverseMass = inverseMass;
+    if (inverseMass == 0) {
+      this.mass = Float.POSITIVE_INFINITY;
+    } else {
+      this.mass = 1 / inverseMass;
+    }
+  }
+  
+  public PVector getMomentum() {
+    PVector v = new PVector(velocity.x, velocity.y);
+    v.mult(getMass());
+    return v;
   }
   
   public boolean isKinematic() {
