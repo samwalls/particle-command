@@ -9,15 +9,22 @@ private class GameObject implements Drawable, Updatable {
   
   private PhysicsComponent physics;
   
+  private ColliderType colliderType;
+  
   private int trailFrameCounter = 0;
   
   private PVector colour = new PVector(random(0, 255), random(0, 255), random(0, 255));
   
   private ArrayDeque<PVector> trailPositions = new ArrayDeque();
   
-  public GameObject() {
+  public GameObject(ColliderType colliderType) {
     super();
     physics = new PhysicsComponent(transform);
+    this.colliderType = colliderType;
+  }
+  
+  public GameObject() {
+    this(ColliderType.NONE);
   }
   
   @Override
@@ -77,5 +84,9 @@ private class GameObject implements Drawable, Updatable {
   // public access to this object's physics
   public PhysicsComponent physics() {
     return physics;
+  }
+  
+  public ColliderType colliderType() {
+    return colliderType;
   }
 }

@@ -8,6 +8,8 @@ ArrayList<GravityObject> gravityObjects = new ArrayList();
 
 private float mousePressX, mousePressY;
 
+private GravityObject star;
+
 void setup() {
   fullScreen();
   //size(1940, 1080); 
@@ -37,7 +39,7 @@ void draw() {
 }
 
 public void initStar() {
-  GravityObject star = new GravityObject(100000000f);
+  star = new GravityObject(1000f, ColliderType.CIRCLE);
   star.physics().setKinematic(false);
   star.physics().setPosition(new PVector(width/2, height/2));
   game.add(star);

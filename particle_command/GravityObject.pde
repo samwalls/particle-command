@@ -1,14 +1,14 @@
 public class GravityObject extends GameObject {
   
   static final float WALL_ELASTICITY = 1;
-  static final float WALL_FRICTION_COEFFICIENT = 0.01;
+  static final float WALL_FRICTION_COEFFICIENT = 0;
   
-  static final float GRAVITY_COEFFICIENT = 0.1;
+  static final float GRAVITY_COEFFICIENT = 1;
   
   private ArrayList<GravityObject> interactiveObjects = new ArrayList(); 
   
-  public GravityObject(float mass) {
-    super();
+  public GravityObject(float mass, ColliderType colliderType) {
+    super(colliderType);
     physics().setMass(mass);
   }
   
@@ -18,6 +18,7 @@ public class GravityObject extends GameObject {
   
   @Override
   public void update() {
+    super.update();
     resolveCollisions();
     attractToOthers();
   }
