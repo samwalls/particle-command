@@ -99,12 +99,14 @@ public class GravityObject extends GameObject {
     // apply basic "gravity"
     for (GameObject other : interactiveObjects) {
       if (other != this) {
-        PVector gravity = new PVector(p.x, p.y);
-        gravity.sub(new PVector(other.physics().getPosition().x, other.physics().getPosition().y));
-        float distanceFromMouse = gravity.mag();
-        gravity.mult(distanceFromMouse <= 10 ? 0 : -GRAVITY_COEFFICIENT/pow(distanceFromMouse, 2));
+        stroke(0, 0, 255);
+        PVector displacement = new PVector(other.physics().getPosition().x - p.x, other.physics().getPosition().y - p.y);
+        //println("energy " + other + (-0.5 * GRAVITY_COEFFICIENT * physics().getMass() * other.physics().getMass()) / (2 * displacement.mag()) + " | acceleration " + physics().getAcceleration());
+        PVector gravity = new PVector(displacement.x, displacement.y);
+        gravity.normalize();
+        gravity.mult(displacement.mag() <= 1 ? 0 : (GRAVITY_COEFFICIENT * physics().getMass() * other.physics().getMass())/pow(displacement.mag(), 2));
         //g.applyForce(new PVector(0, 1), ForceType.ACCELERATION);
-        physics().applyForce(gravity, ForceType.ACCELERATION);
+        physics().applyForce(gravity);
       }
     }
   }
