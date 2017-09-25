@@ -1,6 +1,6 @@
-private class GameObject implements Drawable, Updatable {
+public class GameObject implements Drawable, Updatable {
   
-  private static final int MAX_SIZE = 50;
+  private static final int MAX_SIZE = 100;
   
   private static final int TRAIL_PERIOD = 1;
   private static final int TRAIL_MAX = 50;
@@ -78,7 +78,7 @@ private class GameObject implements Drawable, Updatable {
   
   // public property based on the mass of the object
   public float size() {
-    return max(1, min(physics().getMass(), MAX_SIZE));
+    return max(1, min(0.5 * physics().getMass(), MAX_SIZE));
   }
   
   // public access to this object's physics

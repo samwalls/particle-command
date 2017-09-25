@@ -1,7 +1,7 @@
 import java.util.ArrayDeque;
 
 static final float MASS_MIN = 0.001;
-static final float MASS_MAX = 10;
+static final float MASS_MAX = 50;
 
 GameManager game = new GameManager();
 ArrayList<GravityObject> gravityObjects = new ArrayList();
@@ -22,10 +22,10 @@ void mousePressed() {
 }
 
 void mouseReleased() {
-  GravityObject g = new GravityObject(random(MASS_MIN, MASS_MAX));
+  GravityObject g = new GravityObject(random(MASS_MIN, MASS_MAX), ColliderType.CIRCLE);
   g.physics().setPosition(new PVector(mousePressX, mousePressY));
   // make the object move with respect to the change in position since mouse press
-  g.physics().applyForce(new PVector(mouseX - mousePressX, mouseY - mousePressY).mult(0.01), ForceType.VELOCITY);
+  g.physics().applyForce(new PVector(mouseX - mousePressX, mouseY - mousePressY).mult(0.1), ForceType.VELOCITY);
   g.setInteractiveObjects(gravityObjects);
   game.add(g);
   gravityObjects.add(g);

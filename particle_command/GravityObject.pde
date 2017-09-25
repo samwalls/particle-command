@@ -26,12 +26,13 @@ public class GravityObject extends GameObject {
   @Override
   public void render() {
     super.render();
-    renderDebug();
+    //renderDebug();
   }
   
   private void renderDebug() {
     renderVelocityDebug();
     renderAccelerationDebug();
+    renderInformationDebug();
   }
   
   private void renderVelocityDebug() {
@@ -50,8 +51,13 @@ public class GravityObject extends GameObject {
       physics().getAcceleration().x,
       physics().getAcceleration().y
     );
-    a.mult(1000);
+    a.mult(100000);
     renderRelativeLine(a);
+  }
+  
+  private void renderInformationDebug() {
+    fill(255, 255, 255);
+    text(physics().getMass(), physics().getPosition().x, physics().getPosition().y);
   }
   
   private void resolveCollisions() {
