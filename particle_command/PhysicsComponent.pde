@@ -53,6 +53,9 @@ public class PhysicsComponent {
         // add velocity
         velocity.add(f);
         break;
+      case DISPLACEMENT:
+        // instantaneously add to the position
+        transform.position.add(f);
     }
   }
   
