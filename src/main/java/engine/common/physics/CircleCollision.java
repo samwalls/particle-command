@@ -4,8 +4,6 @@ import engine.common.ForceType;
 import engine.common.GameObject;
 import processing.core.PVector;
 
-import static engine.common.AppContext.app;
-
 public class CircleCollision extends Collision {
 
     public CircleCollision(PVector normal, float penetration, GameObject a, GameObject b, float restitution) {
@@ -19,24 +17,37 @@ public class CircleCollision extends Collision {
     @Override
     public void resolve() {
         System.out.println("collision: " + penetration + " in direction | " + normal);
-        PVector pA = new PVector(contactA.physics().getPosition().x, contactA.physics().getPosition().y);
-        PVector pB = new PVector(contactB.physics().getPosition().x, contactB.physics().getPosition().y);
-        PVector vA = new PVector(contactA.physics().getVelocity().x, contactA.physics().getVelocity().y);
-        PVector vB = new PVector(contactB.physics().getVelocity().x, contactB.physics().getVelocity().y);
-        float mA = contactA.physics().getMass();
-        float mB = contactB.physics().getMass();
+        resolveImpulse();
+//        resolveInterpenetration();
+    }
 
-        // apply velocity to object A
+    private void resolveImpulse() {
+        // adapted from "Game Engine Physics Development" - Millington, section 7.2, pages 109-110
+        float totalInverseMass = contactA.physics().getInverseMass() + contactB.physics().getInverseMass();
+        // if the total mass is infinite we don't need to do anything
+        if (totalInverseMass <= 0)
+            return;
+        float separatingVelocity = relativeVelocity.dot(contactA.physics().getPosition().sub(contactB.physics().getPosition()).normalize());
+        // if the objects are moving away from each other (or not moving) we don't need to do anything
+        if (separatingVelocity >= 0)
+            return;
+        float newSeparatingVelocity = -separatingVelocity * restitution;
+        float deltaSpeed = newSeparatingVelocity - separatingVelocity;
+        float impulse = deltaSpeed / totalInverseMass;
+        PVector impulsePerInverseMass = normal.copy().mult(impulse);
+        contactA.physics().applyForce(impulsePerInverseMass.copy(), ForceType.IMPULSE);
+        contactB.physics().applyForce(impulsePerInverseMass.copy().mult(-1f), ForceType.IMPULSE);
+    }
 
-        PVector displacement = new PVector(pA.x, pA.y);
-        displacement.sub(pB);
-
-        PVector relativeVelocity = new PVector(vA.x, vA.y);
-        relativeVelocity.sub(vB.x, vB.y);
-
-        PVector velocity = new PVector(displacement.x, displacement.y);
-        velocity.mult(-((1 + restitution) * mB / (mA + mB)) * ((relativeVelocity.dot(displacement)) / app().pow(displacement.mag(), 2)));
-
-        contactA.physics().applyForce(velocity, ForceType.VELOCITY);
+    private void resolveInterpenetration() {
+        // TODO
+        if (penetration <= 0)
+            return;
+        float totalInverseMass = contactA.physics().getInverseMass() + contactB.physics().getInverseMass();
+        if (totalInverseMass <= 0)
+            return;
+        PVector displacementPerInverseMass = normal.copy().mult(-penetration / totalInverseMass);
+        contactA.physics().applyForce(displacementPerInverseMass.copy().mult(contactA.physics().getInverseMass()), ForceType.DISPLACEMENT);
+        contactB.physics().applyForce(displacementPerInverseMass.copy().mult(-contactB.physics().getInverseMass()), ForceType.DISPLACEMENT);
     }
 }

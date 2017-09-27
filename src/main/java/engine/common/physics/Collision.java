@@ -50,7 +50,7 @@ public abstract class Collision extends Contact {
                     PVector contactNormal = new PVector(circle.physics().getPosition().x, circle.physics().getPosition().y);
                     contactNormal.sub(other.physics().getPosition());
                     contactNormal.normalize();
-                    return new CircleCollision(contactNormal, r1 + r2 - displacement.mag(), circle, other);
+                    return new CircleCollision(contactNormal, r1 + r2 - displacement.mag(), circle, other ,0f);
                 }
                 return null;
             case BOX:

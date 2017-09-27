@@ -17,8 +17,7 @@ public abstract class Contact {
         this.penetration = penetration;
         this.contactA = contactA;
         this.contactB = contactB;
-        relativeVelocity = new PVector(contactB.physics().getVelocity().x, contactB.physics().getVelocity().y);
-        relativeVelocity.sub(contactA.physics().getVelocity());
+        relativeVelocity = contactA.physics().getVelocity().copy().sub(contactB.physics().getVelocity());
     }
 
     public abstract void resolve();
