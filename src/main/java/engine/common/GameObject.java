@@ -1,99 +1,67 @@
 package engine.common;
 
+import engine.common.event.CollisionEnterEvent;
+import engine.common.event.RenderEvent;
+import engine.common.event.UpdateEvent;
 import engine.common.physics.ColliderType;
+import engine.common.physics.Contact;
 import engine.common.physics.PhysicsComponent;
 import processing.core.PVector;
 
-import java.util.ArrayDeque;
+import static engine.common.GameManager.game;
 
-import static engine.common.AppContext.app;
-
-public class GameObject implements Drawable, Updatable {
+public class GameObject {
 
     private static final int MAX_SIZE = 100;
 
-    private static final int TRAIL_PERIOD = 1;
-    private static final int TRAIL_MAX = 50;
+    protected Transform transform = new Transform();
 
-    private Transform transform = new Transform();
+    protected PhysicsComponent physics;
 
-    private PhysicsComponent physics;
-
-    private ColliderType colliderType;
-
-    private int trailFrameCounter = 0;
-
-    private PVector colour = new PVector(
-            app().random(0, 255),
-            app().random(0, 255),
-            app().random(0, 255)
-    );
-
-    private ArrayDeque<PVector> trailPositions = new ArrayDeque();
+    protected ColliderType colliderType;
 
     public GameObject(ColliderType colliderType) {
         super();
         physics = new PhysicsComponent(transform);
         this.colliderType = colliderType;
+
+        // map game events to code supplied be the engine user
+        game().on(UpdateEvent.class, event -> this.onUpdate());
+        game().on(RenderEvent.class, event -> this.onRender());
+        game().on(CollisionEnterEvent.class, event -> {
+            CollisionEnterEvent e = (CollisionEnterEvent) event;
+            // only do something if the event applies to this object
+            if (e.contact.A() == this)
+                this.onCollisionEnter(e.contact);
+        });
+        game().add(this);
     }
 
     public GameObject() {
         this(ColliderType.NONE);
     }
 
-    @Override
-    public void update() {
-    }
+    /**
+     * Called during every update step. Should be overriden if one wishes to implement extra update behaviour.
+     */
+    public void onUpdate() {}
 
-    @Override
-    public void render() {
-        app().pushMatrix();
-        PVector p = physics().getPosition();
-        float size = size();
-        app().fill(colour.x, colour.y, colour.z);
-        if (++trailFrameCounter % TRAIL_PERIOD == 0) {
-            trailPositions.push(new PVector(p.x, p.y));
-            trailFrameCounter = 0;
-        }
-        renderTrail();
-        while (trailPositions.size() > TRAIL_MAX)
-            trailPositions.removeLast();
-        // draw the box
-        app().stroke(0);
-        app().strokeWeight(1);
-        float radius = size / 2;
-        app().ellipse(p.x, p.y, radius * 2, radius * 2);
-        app().rotate(transform.rotation);
-        app().popMatrix();
-    }
+    /**
+     * Called during every render step. Should be overriden if one wishes to implement extra rendering behaviour.
+     */
+    public void onRender() {}
 
-    protected void renderRelativeLine(PVector v) {
-        app().line(physics().getPosition().x, physics().getPosition().y, physics().getPosition().x + v.x, physics().getPosition().y + v.y);
-    }
+    /**
+     * Called before a collision contact is resolved. Should be overriden if one wishes to implement extra behaviour upon
+     * entering a collision.
+     */
+    public void onCollisionEnter(Contact contact) {}
 
-    private void renderTrail() {
-        if (trailPositions.size() >= 2) {
-            PVector a = null, b = null;
-            float i = 0;
-            for (PVector trailPoint : trailPositions) {
-                b = trailPoint;
-                if (a != null) {
-                    PVector strokeColour = new PVector(colour.x, colour.y, colour.z);
-                    strokeColour.mult(5f / i);
-                    app().stroke(strokeColour.x, strokeColour.y, strokeColour.z);
-                    float trailWidth = 0.8f * (size() - physics().getVelocity().mag() * (i / size()));
-                    app().strokeWeight(trailWidth >= 0 ? trailWidth : 0);
-                    app().line(a.x, a.y, b.x, b.y);
-                }
-                a = b;
-                i++;
-            }
-        }
-    }
+    //******** PUBLIC METHODS ********//
 
     // public property based on the mass of the object
     public float size() {
-        return app().max(1, app().min(0.5f * physics().getMass(), MAX_SIZE));
+        return game().max(1, game().min(0.5f * physics().getMass(), MAX_SIZE));
     }
 
     // public access to this object's physics
@@ -103,5 +71,11 @@ public class GameObject implements Drawable, Updatable {
 
     public ColliderType colliderType() {
         return colliderType;
+    }
+
+    //******** PROTECTED METHODS ********//
+
+    protected void renderRelativeLine(PVector v) {
+        game().line(physics().getPosition().x, physics().getPosition().y, physics().getPosition().x + v.x, physics().getPosition().y + v.y);
     }
 }

@@ -5,29 +5,29 @@ import processing.core.PVector;
 
 public abstract class Contact {
 
-    protected GameObject contactA, contactB;
+    protected GameObject A, B;
 
     protected PVector normal = new PVector();
     protected PVector relativeVelocity = new PVector();
 
     protected float penetration = 0;
 
-    public Contact(PVector normal, float penetration, GameObject contactA, GameObject contactB) {
+    public Contact(PVector normal, float penetration, GameObject A, GameObject B) {
         this.normal = normal;
         this.penetration = penetration;
-        this.contactA = contactA;
-        this.contactB = contactB;
-        relativeVelocity = contactA.physics().getVelocity().copy().sub(contactB.physics().getVelocity());
+        this.A = A;
+        this.B = B;
+        relativeVelocity = A.physics().getVelocity().copy().sub(B.physics().getVelocity());
     }
 
     public abstract void resolve();
 
-    public GameObject contactA() {
-        return contactA;
+    public GameObject A() {
+        return A;
     }
 
-    public GameObject contactB() {
-        return contactB;
+    public GameObject B() {
+        return B;
     }
 
     public PVector getNormal() {

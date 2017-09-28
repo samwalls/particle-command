@@ -23,11 +23,11 @@ public class CircleCollision extends Collision {
 
     private void resolveImpulse() {
         // adapted from "Game Engine Physics Development" - Millington, section 7.2, pages 109-110
-        float totalInverseMass = contactA.physics().getInverseMass() + contactB.physics().getInverseMass();
+        float totalInverseMass = A.physics().getInverseMass() + B.physics().getInverseMass();
         // if the total mass is infinite we don't need to do anything
         if (totalInverseMass <= 0)
             return;
-        float separatingVelocity = relativeVelocity.dot(contactA.physics().getPosition().sub(contactB.physics().getPosition()).normalize());
+        float separatingVelocity = relativeVelocity.dot(A.physics().getPosition().sub(B.physics().getPosition()).normalize());
         // if the objects are moving away from each other (or not moving) we don't need to do anything
         if (separatingVelocity >= 0)
             return;
@@ -35,19 +35,19 @@ public class CircleCollision extends Collision {
         float deltaSpeed = newSeparatingVelocity - separatingVelocity;
         float impulse = deltaSpeed / totalInverseMass;
         PVector impulsePerInverseMass = normal.copy().mult(impulse);
-        contactA.physics().applyForce(impulsePerInverseMass.copy(), ForceType.IMPULSE);
-        contactB.physics().applyForce(impulsePerInverseMass.copy().mult(-1f), ForceType.IMPULSE);
+        A.physics().applyForce(impulsePerInverseMass.copy(), ForceType.IMPULSE);
+        B.physics().applyForce(impulsePerInverseMass.copy().mult(-1f), ForceType.IMPULSE);
     }
 
     private void resolveInterpenetration() {
         // TODO
         if (penetration <= 0)
             return;
-        float totalInverseMass = contactA.physics().getInverseMass() + contactB.physics().getInverseMass();
+        float totalInverseMass = A.physics().getInverseMass() + B.physics().getInverseMass();
         if (totalInverseMass <= 0)
             return;
         PVector displacementPerInverseMass = normal.copy().mult(-penetration / totalInverseMass);
-        contactA.physics().applyForce(displacementPerInverseMass.copy().mult(contactA.physics().getInverseMass()), ForceType.DISPLACEMENT);
-        contactB.physics().applyForce(displacementPerInverseMass.copy().mult(-contactB.physics().getInverseMass()), ForceType.DISPLACEMENT);
+        A.physics().applyForce(displacementPerInverseMass.copy().mult(-A.physics().getInverseMass()), ForceType.DISPLACEMENT);
+        B.physics().applyForce(displacementPerInverseMass.copy().mult(B.physics().getInverseMass()), ForceType.DISPLACEMENT);
     }
 }

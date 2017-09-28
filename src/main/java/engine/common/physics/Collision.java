@@ -3,7 +3,7 @@ package engine.common.physics;
 import engine.common.GameObject;
 import processing.core.PVector;
 
-import static engine.common.AppContext.app;
+import static engine.common.GameManager.game;
 
 public abstract class Collision extends Contact {
 
@@ -12,7 +12,7 @@ public abstract class Collision extends Contact {
     public Collision(PVector normal, float penetration, GameObject a, GameObject b, float restitution) {
         super(normal, penetration, a, b);
         // clip to [0,1]
-        this.restitution = app().max(0, app().min(restitution, 1));
+        this.restitution = game().max(0, game().min(restitution, 1));
     }
 
     public Collision(PVector normal, float penetration, GameObject a, GameObject b) {
