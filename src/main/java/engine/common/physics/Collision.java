@@ -35,22 +35,16 @@ public abstract class Collision extends Contact {
     private static Contact circleIsContacting(GameObject circle, GameObject other) {
         switch (other.colliderType()) {
             case CIRCLE:
-                PVector displacement = new PVector(circle.physics().getPosition().x, circle.physics().getPosition().y);
-                displacement.sub(other.physics().getPosition());
-                // dot product is less than zero if the velocities are pointing towards each other
-                boolean coinciding = 2 * displacement.mag() <= circle.size() + other.size();
+                PVector displacement = circle.physics().getPosition().copy().sub(other.physics().getPosition());
+                float r1 = circle.size() / 2f;
+                float r2 = other.size() / 2f;
+                boolean coinciding = r1 + r2 - displacement.mag() >= 0;
                 if (coinciding) {
-                    float r1 = circle.size() / 2f;
-                    float r2 = circle.size() / 2f;
-                    PVector contactPoint = new PVector(
-                            (circle.physics().getPosition().x * r2 + other.physics().getPosition().x * r1),
-                            (circle.physics().getPosition().y * r2 + other.physics().getPosition().y * r1)
-                    );
-                    contactPoint.div(r1 + r2);
-                    PVector contactNormal = new PVector(circle.physics().getPosition().x, circle.physics().getPosition().y);
-                    contactNormal.sub(other.physics().getPosition());
+                    // the normal points towards the other object
+                    PVector contactNormal = other.physics().getPosition().copy();
+                    contactNormal.sub(circle.physics().getPosition());
                     contactNormal.normalize();
-                    return new CircleCollision(contactNormal, r1 + r2 - displacement.mag(), circle, other ,0f);
+                    return new CircleCollision(contactNormal, r1 + r2 - displacement.mag(), circle, other, 0f);
                 }
                 return null;
             case BOX:
