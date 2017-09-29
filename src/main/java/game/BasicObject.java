@@ -56,6 +56,17 @@ public class BasicObject extends GameObject {
 
     @Override
     public void onCollisionEnter(Contact contact) {
+        colour = new PVector(255, 0, 0);
+    }
+
+    @Override
+    public void onCollisionStay(Contact contact) {
+        colour = new PVector(0, 255, 0);
+    }
+
+    @Override
+    public void onCollisionExit(GameObject other) {
+        colour = new PVector(0, 0, 255);
     }
 
     private void renderParticle() {
