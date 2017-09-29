@@ -3,7 +3,7 @@ package engine.common.physics;
 import engine.common.component.GameObject;
 import processing.core.PVector;
 
-public abstract class Contact {
+public class Contact {
 
     protected GameObject A, B;
 
@@ -20,7 +20,25 @@ public abstract class Contact {
         relativeVelocity = A.physics().getVelocity().copy().sub(B.physics().getVelocity());
     }
 
-    public abstract void resolve();
+    public Contact copy() {
+        return new Contact(normal.copy(), penetration, A, B);
+    }
+
+    /**
+     * Swap A and B.
+     * @return this object
+     */
+    public Contact swap() {
+        GameObject C = A;
+        A = B;
+        B = C;
+        return this;
+    }
+
+    /**
+     * Resolve the contact, should be overriden to add behaviour
+     */
+    public void resolve() { }
 
     public GameObject A() {
         return A;

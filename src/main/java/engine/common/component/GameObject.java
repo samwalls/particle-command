@@ -1,18 +1,19 @@
 package engine.common.component;
 
-import engine.common.event.CollisionEnterEvent;
-import engine.common.event.RenderEvent;
-import engine.common.event.UpdateEvent;
+import engine.common.event.*;
 import engine.common.physics.ColliderType;
-import engine.common.physics.Contact;
+import engine.common.physics.ContactState;
 import engine.common.physics.PhysicsComponent;
 import processing.core.PVector;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static engine.common.component.GameManager.game;
 
 public class GameObject extends Component {
 
-    private static final int MAX_SIZE = 100;
+    private static final float MAX_SIZE = 100f;
 
     protected Transform transform = new Transform();
 
@@ -20,35 +21,20 @@ public class GameObject extends Component {
 
     protected ColliderType colliderType;
 
+    private Map<GameObject, ContactState> contactStateMap;
+
     public GameObject(ColliderType colliderType) {
         super();
         physics = new PhysicsComponent(transform);
         this.colliderType = colliderType;
+        this.contactStateMap = new HashMap<>();
         game().add(this);
+        setupEventHandlers();
     }
 
     public GameObject() {
         this(ColliderType.NONE);
     }
-
-    /**
-     * Called during every update step. Should be overriden if one wishes to implement extra update behaviour.
-     */
-    @Override
-    public void onUpdate() {}
-
-    /**
-     * Called during every render step. Should be overriden if one wishes to implement extra rendering behaviour.
-     */
-    @Override
-    public void onRender() {}
-
-    /**
-     * Called before a collision contact is resolved. Should be overriden if one wishes to implement extra behaviour upon
-     * entering a collision.
-     */
-    @Override
-    public void onCollisionEnter(Contact contact) {}
 
     //******** PUBLIC METHODS ********//
 
@@ -70,5 +56,49 @@ public class GameObject extends Component {
 
     protected void renderRelativeLine(PVector v) {
         game().line(physics().getPosition().x, physics().getPosition().y, physics().getPosition().x + v.x, physics().getPosition().y + v.y);
+    }
+
+    //******** PACKAGE-LOCAL METHODS ********//
+
+    Map<GameObject, ContactState> getContactStateMap() {
+        return contactStateMap;
+    }
+
+    //******** PRIVATE METHODS ********//
+
+    private void setupEventHandlers() {
+        // map game events to code supplied be the engine user
+        game().on(UpdateEvent.class, event -> this.onUpdate());
+
+        game().on(RenderEvent.class, event -> this.onRender());
+
+        game().on(CollisionEnterEvent.class, event -> {
+            CollisionEnterEvent e = (CollisionEnterEvent) event;
+            // only do something if the event applies to this object
+            if (e.contact.A() == this) {
+                onCollisionEnter(e.contact);
+                // call on the other object as well
+                e.contact.B().onCollisionEnter(e.contact.copy());
+            }
+        });
+
+        game().on(CollisionStayEvent.class, event -> {
+            CollisionStayEvent e = (CollisionStayEvent) event;
+            // only do something if the event applies to this object
+            if (e.contact.A() == this) {
+                onCollisionStay(e.contact);
+                // call on the other object as well
+                e.contact.B().onCollisionStay(e.contact.copy());
+            }
+        });
+
+        game().on(CollisionExitEvent.class, event -> {
+            CollisionExitEvent e = (CollisionExitEvent) event;
+            // only do something if the event applies to this object
+            if (e.A == this) {
+                onCollisionExit(e.B);
+                e.B.onCollisionExit(e.A);
+            }
+        });
     }
 }
