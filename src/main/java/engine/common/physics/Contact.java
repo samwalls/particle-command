@@ -1,6 +1,6 @@
 package engine.common.physics;
 
-import engine.common.GameObject;
+import engine.common.component.GameObject;
 import processing.core.PVector;
 
 public abstract class Contact {

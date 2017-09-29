@@ -1,4 +1,4 @@
-package engine.common;
+package engine.common.component;
 
 import engine.common.event.CollisionEnterEvent;
 import engine.common.event.RenderEvent;
@@ -8,9 +8,9 @@ import engine.common.physics.Contact;
 import engine.common.physics.PhysicsComponent;
 import processing.core.PVector;
 
-import static engine.common.GameManager.game;
+import static engine.common.component.GameManager.game;
 
-public class GameObject {
+public class GameObject extends Component {
 
     private static final int MAX_SIZE = 100;
 
@@ -24,16 +24,6 @@ public class GameObject {
         super();
         physics = new PhysicsComponent(transform);
         this.colliderType = colliderType;
-
-        // map game events to code supplied be the engine user
-        game().on(UpdateEvent.class, event -> this.onUpdate());
-        game().on(RenderEvent.class, event -> this.onRender());
-        game().on(CollisionEnterEvent.class, event -> {
-            CollisionEnterEvent e = (CollisionEnterEvent) event;
-            // only do something if the event applies to this object
-            if (e.contact.A() == this)
-                this.onCollisionEnter(e.contact);
-        });
         game().add(this);
     }
 
@@ -44,17 +34,20 @@ public class GameObject {
     /**
      * Called during every update step. Should be overriden if one wishes to implement extra update behaviour.
      */
+    @Override
     public void onUpdate() {}
 
     /**
      * Called during every render step. Should be overriden if one wishes to implement extra rendering behaviour.
      */
+    @Override
     public void onRender() {}
 
     /**
      * Called before a collision contact is resolved. Should be overriden if one wishes to implement extra behaviour upon
      * entering a collision.
      */
+    @Override
     public void onCollisionEnter(Contact contact) {}
 
     //******** PUBLIC METHODS ********//

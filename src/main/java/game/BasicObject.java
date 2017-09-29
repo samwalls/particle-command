@@ -1,7 +1,7 @@
 package game;
 
-import engine.common.ForceType;
-import engine.common.GameObject;
+import engine.common.physics.ForceType;
+import engine.common.component.GameObject;
 import engine.common.physics.ColliderType;
 import engine.common.physics.Contact;
 import processing.core.PVector;
@@ -10,7 +10,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
-import static engine.common.GameManager.game;
+import static engine.common.component.GameManager.game;
 
 public class BasicObject extends GameObject {
 
@@ -50,17 +50,30 @@ public class BasicObject extends GameObject {
 
     @Override
     public void onRender() {
-        renderTrail();
+//        renderTrail();
+        renderParticle();
     }
 
     @Override
     public void onCollisionEnter(Contact contact) {
     }
 
+    private void renderParticle() {
+        PVector p = physics.getPosition();
+        // draw the particle as a circle
+        game().pushMatrix();
+        game().fill(colour.x, colour.y, colour.z);
+        float radius = size() / 2;
+        game().ellipse(p.x, p.y, radius * 2, radius * 2);
+        game().rotate(transform.rotation);
+        game().popMatrix();
+    }
+
     private void renderTrail() {
         game().pushMatrix();
         PVector p = physics().getPosition();
-        float size = size();
+        game().stroke(0);
+        game().strokeWeight(1);
         game().fill(colour.x, colour.y, colour.z);
         if (++trailFrameCounter % TRAIL_PERIOD == 0) {
             trailPositions.push(new PVector(p.x, p.y));
@@ -69,12 +82,6 @@ public class BasicObject extends GameObject {
         renderTrailSegments();
         while (trailPositions.size() > TRAIL_MAX)
             trailPositions.removeLast();
-        // draw the box
-        game().stroke(0);
-        game().strokeWeight(1);
-        float radius = size / 2;
-        game().ellipse(p.x, p.y, radius * 2, radius * 2);
-        game().rotate(transform.rotation);
         game().popMatrix();
     }
 

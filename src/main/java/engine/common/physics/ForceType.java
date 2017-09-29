@@ -1,4 +1,4 @@
-package engine.common;
+package engine.common.physics;
 
 public enum ForceType {
     FORCE,

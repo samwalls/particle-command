@@ -1,9 +1,9 @@
 package engine.common.physics;
 
-import engine.common.GameObject;
+import engine.common.component.GameObject;
 import processing.core.PVector;
 
-import static engine.common.GameManager.game;
+import static engine.common.component.GameManager.game;
 
 public abstract class Collision extends Contact {
 

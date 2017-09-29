@@ -1,4 +1,4 @@
-package engine.common;
+package engine.common.component;
 
 import processing.core.PVector;
 

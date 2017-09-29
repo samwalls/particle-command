@@ -1,4 +1,4 @@
-package engine.common;
+package engine.common.component;
 
 import engine.common.event.*;
 import engine.common.physics.Collision;

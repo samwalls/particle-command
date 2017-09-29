@@ -1,7 +1,6 @@
 package engine.common.physics;
 
-import engine.common.ForceType;
-import engine.common.GameObject;
+import engine.common.component.GameObject;
 import processing.core.PVector;
 
 public class CircleCollision extends Collision {

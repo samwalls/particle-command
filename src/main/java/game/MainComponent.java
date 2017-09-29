@@ -1,7 +1,7 @@
 package game;
 
-import engine.common.ForceType;
-import engine.common.GameManager;
+import engine.common.physics.ForceType;
+import engine.common.component.GameManager;
 import engine.common.physics.ColliderType;
 import processing.core.PApplet;
 import processing.core.PVector;

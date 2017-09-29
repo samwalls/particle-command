@@ -1,7 +1,6 @@
 package engine.common.physics;
 
-import engine.common.ForceType;
-import engine.common.Transform;
+import engine.common.component.Transform;
 import processing.core.PVector;
 
 public class PhysicsComponent {
