@@ -6,9 +6,7 @@ import engine.common.physics.ColliderType;
 import engine.common.physics.Contact;
 import processing.core.PVector;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static engine.common.component.GameManager.game;
 
@@ -25,6 +23,9 @@ public class BasicObject extends GameObject {
 
     private ArrayDeque<PVector> trailPositions = new ArrayDeque();
     private int trailFrameCounter = 0;
+
+    // map of things this object is touching, to the number of frames they have been touching for
+    private Map<GameObject, Integer> touching = new HashMap<>();
 
     private PVector colour;
 
@@ -61,23 +62,41 @@ public class BasicObject extends GameObject {
 
     @Override
     public void onCollisionStay(Contact contact) {
+        GameObject other = contact.B();
+        if (!touching.containsKey(other))
+            touching.put(other, 0);
+        touching.put(other, touching.get(other) + 1);
         colour = new PVector(0, 255, 0);
     }
 
     @Override
     public void onCollisionExit(GameObject other) {
+        touching.remove(other);
         colour = new PVector(0, 0, 255);
     }
 
     private void renderParticle() {
+//        renderTrail();
         PVector p = physics.getPosition();
         // draw the particle as a circle
         game().pushMatrix();
         game().fill(colour.x, colour.y, colour.z);
         float radius = size() / 2;
+        game().stroke(0, 0);
         game().ellipse(p.x, p.y, radius * 2, radius * 2);
         game().rotate(transform.rotation);
         game().popMatrix();
+        renderTouching();
+    }
+
+    private void renderTouching() {
+        for (Map.Entry<GameObject, Integer> entry : touching.entrySet()) {
+            game().pushMatrix();
+            game().stroke(255, 0 , 0, entry.getValue());
+            game().strokeWeight(2);
+            game().line(transform.position.x, transform.position.y, entry.getKey().physics().getPosition().x, entry.getKey().physics().getPosition().y);
+            game().popMatrix();
+        }
     }
 
     private void renderTrail() {
@@ -183,6 +202,6 @@ public class BasicObject extends GameObject {
 //                physics().applyForce(gravity);
 //            }
 //        }
-//        physics().applyForce(new PVector(0, GRAVITY_COEFFICIENT), ForceType.ACCELERATION);
+//        physics().applyForce(new PVector(GRAVITY_COEFFICIENT, GRAVITY_COEFFICIENT), ForceType.ACCELERATION);
     }
 }

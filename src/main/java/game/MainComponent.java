@@ -1,5 +1,6 @@
 package game;
 
+import engine.common.component.GameObject;
 import engine.common.physics.ForceType;
 import engine.common.component.GameManager;
 import engine.common.physics.ColliderType;
@@ -18,8 +19,8 @@ public class MainComponent extends GameManager {
         PApplet.main(MainComponent.class.getName());
     }
 
-    static final float MASS_MIN = 0.001f;
-    static final float MASS_MAX = 50;
+    static final float MASS_MIN = 1f;
+    static final float MASS_MAX = 100;
 
     private List<BasicObject> basicObjects = new ArrayList<>();
 
@@ -35,6 +36,10 @@ public class MainComponent extends GameManager {
     public void setup() {
         frameRate(60);
 //        initStar();
+        for (int i = 0; i < 300; i++) {
+            GameObject g = new BasicObject(100, ColliderType.CIRCLE);
+            g.physics().setPosition(new PVector(random(g.size(), width - g.size()), random(g.size(), height - g.size())));
+        }
     }
 
     public void mousePressed() {
