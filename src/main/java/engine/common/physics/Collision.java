@@ -19,7 +19,7 @@ public abstract class Collision extends Contact {
         this(normal, penetration, a, b, 1);
     }
 
-    public static Contact areContacting(GameObject a, GameObject b) {
+    public static Contact[] areContacting(GameObject a, GameObject b) {
         switch (a.colliderType()) {
             case CIRCLE:
                 return circleIsContacting(a, b);
@@ -32,19 +32,23 @@ public abstract class Collision extends Contact {
         }
     }
 
-    private static Contact circleIsContacting(GameObject circle, GameObject other) {
+    private static Contact[] circleIsContacting(GameObject circle, GameObject other) {
         switch (other.colliderType()) {
             case CIRCLE:
                 PVector displacement = circle.physics().getPosition().copy().sub(other.physics().getPosition());
                 float r1 = circle.size() / 2f;
                 float r2 = other.size() / 2f;
-                boolean coinciding = r1 + r2 - displacement.mag() >= 0;
+                boolean coinciding = r1 + r2 >= displacement.mag();
                 if (coinciding) {
                     // the normal points towards the other object
                     PVector contactNormal = other.physics().getPosition().copy();
                     contactNormal.sub(circle.physics().getPosition());
                     contactNormal.normalize();
-                    return new CircleCollision(contactNormal, r1 + r2 - displacement.mag(), circle, other, 0f);
+                    float interpenetration = r1 + r2 - displacement.mag();
+                    return new Contact[] {
+                            new CircleCollision(contactNormal, interpenetration, circle, other, 0f),
+                            new CircleContact(contactNormal, interpenetration, circle, other),
+                    };
                 }
                 return null;
             case BOX:
@@ -57,7 +61,7 @@ public abstract class Collision extends Contact {
         }
     }
 
-    private static Contact boxIsContacting(GameObject box, GameObject other) {
+    private static Contact[] boxIsContacting(GameObject box, GameObject other) {
         // TODO
         return null;
     }

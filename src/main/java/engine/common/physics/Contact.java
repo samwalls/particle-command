@@ -49,11 +49,15 @@ public class Contact {
     }
 
     public PVector getNormal() {
-        return normal;
+        return normal.copy();
     }
 
     public PVector getRelativeVelocity() {
-        return relativeVelocity;
+        return relativeVelocity.copy();
+    }
+
+    public float getSeparatingVelocity() {
+        return relativeVelocity.dot(relativeVelocity.copy().normalize());
     }
 
     public float getPenetration() {

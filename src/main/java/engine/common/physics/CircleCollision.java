@@ -15,12 +15,6 @@ public class CircleCollision extends Collision {
 
     @Override
     public void resolve() {
-//        System.out.println("collision: " + penetration + " in direction | " + normal);
-        resolveImpulse();
-        resolveInterpenetration();
-    }
-
-    private void resolveImpulse() {
         // adapted from "Game Engine Physics Development" - Millington, section 7.2, pages 109-110
         float totalInverseMass = A.physics().getInverseMass() + B.physics().getInverseMass();
         // if the total mass is infinite we don't need to do anything
@@ -36,17 +30,5 @@ public class CircleCollision extends Collision {
         PVector impulsePerInverseMass = normal.copy().mult(impulse);
         A.physics().applyForce(impulsePerInverseMass.copy().mult(-1f), ForceType.IMPULSE);
         B.physics().applyForce(impulsePerInverseMass.copy(), ForceType.IMPULSE);
-    }
-
-    private void resolveInterpenetration() {
-        // adapted from "Game Engine Physics Development" - Millington, section 7.2.2
-        if (penetration <= 0)
-            return;
-        float totalInverseMass = A.physics().getInverseMass() + B.physics().getInverseMass();
-        if (totalInverseMass <= 0)
-            return;
-        PVector displacementPerInverseMass = normal.copy().mult(-penetration / totalInverseMass);
-        A.physics().applyForce(displacementPerInverseMass.copy().mult(A.physics().getInverseMass()), ForceType.DISPLACEMENT);
-        B.physics().applyForce(displacementPerInverseMass.copy().mult(-B.physics().getInverseMass()), ForceType.DISPLACEMENT);
     }
 }
