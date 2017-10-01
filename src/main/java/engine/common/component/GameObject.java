@@ -73,7 +73,12 @@ public class GameObject extends Component {
         // map game events to code supplied be the engine user
         game().on(UpdateEvent.class, event -> this.onUpdate());
 
-        game().on(RenderEvent.class, event -> this.onRender());
+        game().on(RenderEvent.class, event -> {
+            // check that this game object is in the relevant render layer
+            if (((RenderEvent)event).layer().equalsIgnoreCase(renderLayer())) {
+                this.onRender();
+            }
+        });
 
         game().on(CollisionEnterEvent.class, event -> {
             CollisionEnterEvent e = (CollisionEnterEvent) event;

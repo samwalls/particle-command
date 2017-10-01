@@ -15,6 +15,8 @@ public class GameManager extends PApplet {
 
     private EventManager eventManager;
     private List<GameObject> gameObjects = new ArrayList<>();
+    private List<String> renderLayers = new ArrayList<>();
+    private boolean defaultRenderLayerDefined = false;
 
     private ContactResolver contactResolver;
 
@@ -43,7 +45,7 @@ public class GameManager extends PApplet {
         contactResolver.resolveAll();
         for (GameObject g : all())
             g.physics().integrate();
-        game().emit(new RenderEvent());
+        renderAll();
     }
 
     void on(Class<? extends Event> type, Consumer<Event> consumer) {
@@ -62,9 +64,35 @@ public class GameManager extends PApplet {
         return Collections.unmodifiableCollection(gameObjects);
     }
 
+    public void setRenderingLayers(List<String> layers) {
+        this.renderLayers = layers;
+        defaultRenderLayerDefined = false;
+        for (String layer : layers)
+            if (layer.equalsIgnoreCase(Component.DEFAULT_RENDER_LAYER))
+                defaultRenderLayerDefined = true;
+    }
+
+    public Collection<String> renderingLayers() {
+        return Collections.unmodifiableCollection(renderLayers);
+    }
+
     //******** PACKAGE-LOCAL METHODS ********//
 
     void add(GameObject go) {
         gameObjects.add(go);
+    }
+
+    //******** PRIVATE METHODS ********//
+
+    private void renderAll() {
+        if (renderLayers == null) {
+            game().emit(new RenderEvent());
+            return;
+        }
+        // if no default layer is defined, render it first
+        if (!defaultRenderLayerDefined)
+            game().emit(new RenderEvent());
+        for (String layer : renderLayers)
+            game().emit(new RenderEvent(layer));
     }
 }

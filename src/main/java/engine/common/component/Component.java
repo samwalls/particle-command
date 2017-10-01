@@ -5,6 +5,8 @@ import processing.core.PVector;
 
 public class Component extends RelativeTransform implements Drawable, Updatable, Collidable {
 
+    public static final String DEFAULT_RENDER_LAYER = "default";
+
     protected Transform transform;
 
     public Component(Component parent) throws IllegalArgumentException {
@@ -23,6 +25,11 @@ public class Component extends RelativeTransform implements Drawable, Updatable,
     /*
      * These event methods should be overridden to insert behaviour.
      */
+
+    @Override
+    public String renderLayer() {
+        return DEFAULT_RENDER_LAYER;
+    }
 
     @Override
     public void onRender() { }
