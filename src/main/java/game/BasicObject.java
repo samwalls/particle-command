@@ -72,19 +72,20 @@ public class BasicObject extends GameObject {
     @Override
     public void onCollisionExit(GameObject other) {
         touching.remove(other);
-        colour = new PVector(0, 0, 255);
+        if (touching.size() <= 0)
+            colour = new PVector(0, 0, 255);
     }
 
     private void renderParticle() {
 //        renderTrail();
-        PVector p = physics.getPosition();
+        PVector p = globalPosition();
         // draw the particle as a circle
         game().pushMatrix();
         game().fill(colour.x, colour.y, colour.z);
         float radius = size() / 2;
         game().stroke(0, 0);
         game().ellipse(p.x, p.y, radius * 2, radius * 2);
-        game().rotate(transform.rotation);
+        game().rotate(globalRotation());
         game().popMatrix();
         renderTouching();
     }
@@ -94,7 +95,9 @@ public class BasicObject extends GameObject {
             game().pushMatrix();
             game().stroke(255, 0 , 0, entry.getValue());
             game().strokeWeight(2);
-            game().line(transform.position.x, transform.position.y, entry.getKey().physics().getPosition().x, entry.getKey().physics().getPosition().y);
+            PVector p1 = globalPosition();
+            PVector p2 = entry.getKey().globalPosition();
+            game().line(p1.x, p1.y, p2.x, p2.y);
             game().popMatrix();
         }
     }
@@ -202,6 +205,6 @@ public class BasicObject extends GameObject {
 //                physics().applyForce(gravity);
 //            }
 //        }
-//        physics().applyForce(new PVector(GRAVITY_COEFFICIENT, GRAVITY_COEFFICIENT), ForceType.ACCELERATION);
+        physics().applyForce(new PVector(0, GRAVITY_COEFFICIENT), ForceType.ACCELERATION);
     }
 }

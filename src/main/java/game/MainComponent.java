@@ -28,6 +28,8 @@ public class MainComponent extends GameManager {
 
     private BasicObject star;
 
+    private GameObject parentObject = new GameObject();
+
     public void settings() {
         fullScreen();
 //        size(1940, 1080);
@@ -38,18 +40,29 @@ public class MainComponent extends GameManager {
 //        initStar();
         for (int i = 0; i < 300; i++) {
             GameObject g = new BasicObject(100, ColliderType.CIRCLE);
-            g.physics().setPosition(new PVector(random(g.size(), width - g.size()), random(g.size(), height - g.size())));
+            g.setPosition(new PVector(random(g.size(), width - g.size()), random(g.size(), height - g.size())));
+            g.setParent(parentObject);
         }
     }
+
+    private PVector parentPreviousPosition = new PVector();
 
     public void mousePressed() {
         mousePressX = mouseX;
         mousePressY = mouseY;
+        parentPreviousPosition = parentObject.position();
+    }
+
+    public void mouseDragged() {
+        PVector mouseDelta = new PVector(mouseX - mousePressX, mouseY - mousePressY);
+        mouseDelta.mult(1f);
+        parentObject.setPosition(parentPreviousPosition.copy().add(mouseDelta));
     }
 
     public void mouseReleased() {
         BasicObject g = new BasicObject(random(MASS_MIN, MASS_MAX), ColliderType.CIRCLE);
-        g.physics().setPosition(new PVector(mousePressX, mousePressY));
+        g.setParent(parentObject);
+        g.setPosition(new PVector(mousePressX, mousePressY));
         // make the object move with respect to the change in position since mouse press
         g.physics().applyForce(new PVector(mouseX - mousePressX, mouseY - mousePressY).mult(0.1f), ForceType.VELOCITY);
         g.setInteractiveObjects(basicObjects);
