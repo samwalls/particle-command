@@ -17,7 +17,7 @@ public class GameObject extends Component {
 
     protected PhysicsComponent physics;
 
-    protected ColliderType colliderType;
+    protected ColliderComponent collider;
 
     private Map<GameObject, ContactState> contactStateMap;
 
@@ -25,7 +25,7 @@ public class GameObject extends Component {
         super(parent);
         physics = new PhysicsComponent(parent);
         physics.setTransform(transform);
-        this.colliderType = colliderType;
+        this.collider = new ColliderComponent(this, colliderType);
         this.contactStateMap = new HashMap<>();
         game().add(this);
         setupEventHandlers();
@@ -49,10 +49,6 @@ public class GameObject extends Component {
     // public access to this object's physics
     public PhysicsComponent physics() {
         return physics;
-    }
-
-    public ColliderType colliderType() {
-        return colliderType;
     }
 
     //******** PROTECTED METHODS ********//

@@ -1,10 +1,8 @@
 package engine.common.component;
 
-import engine.common.component.GameObject;
 import engine.common.event.CollisionEnterEvent;
 import engine.common.event.CollisionExitEvent;
 import engine.common.event.CollisionStayEvent;
-import engine.common.physics.Collision;
 import engine.common.physics.Contact;
 import engine.common.physics.ContactState;
 
@@ -25,7 +23,13 @@ public class ContactResolver {
 
     private void resolveContacts(List<Contact> contacts) {
         for (Contact c : contacts) {
-            c.resolve();
+            boolean bothNonTrigger =
+                    c.A() != null && !c.A().collider.isTrigger() &&
+                    c.B() != null && !c.B().collider.isTrigger();
+            // only resolve contacts if both of the objects are non-trigger types
+            if (bothNonTrigger)
+                c.resolve();
+            // emit relevant collision events for the contact
             handleActiveContact(c.A(), c);
         }
     }
@@ -36,7 +40,7 @@ public class ContactResolver {
         for (GameObject other : game().all()) {
             if (other == g)
                 continue;
-            Contact[] detected = Collision.areContacting(g, other);
+            Contact[] detected = ColliderComponent.areContacting(g, other);
             if (detected == null || detected.length <= 0)
                 continue;
             Collections.addAll(contacts, detected);
@@ -45,6 +49,7 @@ public class ContactResolver {
     }
 
     private void handleActiveContact(GameObject g, Contact contact) {
+        // TODO this method may generate multiple enter / stay events per frame, if multiple contacts are resolved for the same coincidence of objects (e.g. collision bounce + interpenetration resolution)
         GameObject other = contact.B();
         Map<GameObject, ContactState> contactStateMap = g.getContactStateMap();
         // add the other object to the map if it doesn't exist (initial contact state NONE)
@@ -77,7 +82,7 @@ public class ContactResolver {
             // if the object is reported to be involved in a collision, check for collision exit
             boolean contactingBefore = contactState == ContactState.ENTER || contactState == ContactState.STAY;
             // if the objects were contacting previously, and are no longer, emit a collisionExitEvent
-            if (contactingBefore && Collision.areContacting(g, entry.getKey()) == null) {
+            if (contactingBefore && ColliderComponent.areContacting(g, entry.getKey()) == null) {
                 contactStateMap.put(entry.getKey(), ContactState.NONE);
                 game().emit(new CollisionExitEvent(g, entry.getKey()));
             }
