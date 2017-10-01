@@ -1,5 +1,6 @@
 package game;
 
+import engine.common.component.Component;
 import engine.common.component.GameObject;
 import engine.common.physics.ForceType;
 import engine.common.component.GameManager;
@@ -8,6 +9,7 @@ import processing.core.PApplet;
 import processing.core.PVector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,11 +40,16 @@ public class MainComponent extends GameManager {
     public void setup() {
         frameRate(60);
 //        initStar();
-        for (int i = 0; i < 300; i++) {
+        for (int i = 0; i < 150; i++) {
             GameObject g = new BasicObject(100, ColliderType.CIRCLE);
             g.setPosition(new PVector(random(g.size(), width - g.size()), random(g.size(), height - g.size())));
             g.setParent(parentObject);
         }
+        GameObject foreground = new ForegroundObject();
+        foreground.setPosition(new PVector(500, 500));
+        game().setRenderingLayers(Arrays.asList(
+                "foreground"
+        ));
     }
 
     private PVector parentPreviousPosition = new PVector();
