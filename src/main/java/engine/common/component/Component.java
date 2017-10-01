@@ -1,13 +1,28 @@
 package engine.common.component;
 
-import engine.common.event.CollisionEnterEvent;
-import engine.common.event.RenderEvent;
-import engine.common.event.UpdateEvent;
 import engine.common.physics.Contact;
+import processing.core.PVector;
 
-import static engine.common.component.GameManager.game;
+public class Component extends RelativeTransform implements Drawable, Updatable, Collidable {
 
-public class Component implements Drawable, Updatable, Collidable {
+    protected Transform transform;
+
+    public Component(Component parent) throws IllegalArgumentException {
+        super(parent);
+        transform = new Transform();
+    }
+
+    //******** PUBLIC METHODS ********//
+
+    public void copyFrom(Component other) {
+        setPosition(other.position());
+        setRotation(other.rotation());
+        setScale(other.scale());
+    }
+
+    /*
+     * These event methods should be overridden to insert behaviour.
+     */
 
     @Override
     public void onRender() { }
@@ -23,4 +38,39 @@ public class Component implements Drawable, Updatable, Collidable {
 
     @Override
     public void onCollisionExit(GameObject other) { }
+
+    /**
+     * @return the coordinates
+     */
+    public PVector position() {
+        return transform.position();
+    }
+
+    public void setPosition(PVector position) {
+        transform.setPosition(position);
+    }
+
+    @Override
+    public float rotation() {
+        return transform.rotation();
+    }
+
+    @Override
+    public void setRotation(float rotation) {
+        transform.setRotation(rotation);
+    }
+
+    @Override
+    public PVector scale() {
+        return transform.scale();
+    }
+
+    @Override
+    public void setScale(PVector scale) {
+        transform.setScale(scale);
+    }
+
+    protected void setTransform(Transform transform) {
+        this.transform = transform;
+    }
 }

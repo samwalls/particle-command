@@ -15,21 +15,24 @@ public class GameObject extends Component {
 
     private static final float MAX_SIZE = 100f;
 
-    protected Transform transform = new Transform();
-
     protected PhysicsComponent physics;
 
     protected ColliderType colliderType;
 
     private Map<GameObject, ContactState> contactStateMap;
 
-    public GameObject(ColliderType colliderType) {
-        super();
-        physics = new PhysicsComponent(transform);
+    public GameObject(GameObject parent, ColliderType colliderType) {
+        super(parent);
+        physics = new PhysicsComponent(parent);
+        physics.setTransform(transform);
         this.colliderType = colliderType;
         this.contactStateMap = new HashMap<>();
         game().add(this);
         setupEventHandlers();
+    }
+
+    public GameObject(ColliderType colliderType) {
+        this(null, colliderType);
     }
 
     public GameObject() {

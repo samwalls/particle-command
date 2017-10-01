@@ -1,11 +1,11 @@
 package engine.common.physics;
 
+import engine.common.component.Component;
 import engine.common.component.Transform;
 import processing.core.PVector;
 
-public class PhysicsComponent {
+public class PhysicsComponent extends Component {
 
-    private Transform transform;
     private PVector velocity = new PVector();
     private PVector acceleration = new PVector();
 
@@ -16,8 +16,8 @@ public class PhysicsComponent {
 
     private boolean integrated = true;
 
-    public PhysicsComponent(Transform transform) {
-        this.transform = transform;
+    public PhysicsComponent(Component parent) {
+        super(parent);
     }
 
     public void integrate() {
@@ -26,12 +26,14 @@ public class PhysicsComponent {
             // i.e. it's important to integrate the velocity before we integrate the position
             // https://gafferongames.com/post/integration_basics/
             velocity.add(acceleration);
-            transform.position.add(velocity);
+            setPosition(position().add(velocity));
             integrated = true;
         }
     }
 
     public void applyForce(PVector force, ForceType type) {
+        // TODO, find a way of converting the input force to the relevant vector relative to the parent...
+        // ...currently, if rotation is implemented, the input vector is still assumed to be relative to the parent
         if (force == null || !isKinematic) {
             return;
         }
@@ -60,7 +62,7 @@ public class PhysicsComponent {
                 break;
             case DISPLACEMENT:
                 // instantaneously add to the position
-                transform.position.add(f);
+                setPosition(position().add(f));
         }
     }
 
@@ -69,30 +71,22 @@ public class PhysicsComponent {
     }
 
     public PVector getPosition() {
-        return new PVector(transform.position.x, transform.position.y);
-    }
-
-    public void setPosition(PVector position) {
-        if (position == null)
-            return;
-        transform.position.x = position.x;
-        transform.position.y = position.y;
+        return transform.position();
     }
 
     public PVector getVelocity() {
-        return new PVector(velocity.x, velocity.y);
+        return velocity.copy();
     }
 
     public void setVelocity(PVector v) {
         if (v == null)
             return;
-        velocity.x = v.x;
-        velocity.y = v.y;
+        velocity = v.copy();
     }
 
     public PVector getAcceleration() {
         // acceleration is read-only, create new vector
-        return new PVector(acceleration.x, acceleration.y);
+        return acceleration.copy();
     }
 
     public float getMass() {
