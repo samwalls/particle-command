@@ -50,6 +50,11 @@ public class BasicObject extends GameObject {
     }
 
     @Override
+    public String renderLayer() {
+        return "particle";
+    }
+
+    @Override
     public void onRender() {
 //        renderTrail();
         renderParticle();

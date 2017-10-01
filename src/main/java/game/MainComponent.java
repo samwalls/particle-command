@@ -45,9 +45,11 @@ public class MainComponent extends GameManager {
             g.setPosition(new PVector(random(g.size(), width - g.size()), random(g.size(), height - g.size())));
             g.setParent(parentObject);
         }
-        GameObject foreground = new ForegroundObject();
-        foreground.setPosition(new PVector(500, 500));
+        GameObject gravityRegion = new GravityRegionObject();
+        gravityRegion.setPosition(new PVector(width/2f, height/2f));
         game().setRenderingLayers(Arrays.asList(
+                "background",
+                "particle",
                 "foreground"
         ));
     }
