@@ -30,6 +30,19 @@ public class AABB extends Component {
         return result;
     }
 
+    public static AABB box(float width, float height) {
+        AABB result = new AABB();
+        result.min = new PVector (
+                -width / 2f,
+                -height / 2f
+        );
+        result.max = new PVector(
+                width / 2f,
+                height / 2f
+        );
+        return result;
+    }
+
     public float width() {
         return max.x - min.x;
     }

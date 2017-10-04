@@ -41,9 +41,8 @@ public class ContactResolver {
             if (other == g)
                 continue;
             Contact[] detected = ColliderComponent.areContacting(g, other);
-            if (detected == null || detected.length <= 0)
-                continue;
-            Collections.addAll(contacts, detected);
+            if (detected != null)
+                Collections.addAll(contacts, detected);
         }
         return contacts;
     }
@@ -82,7 +81,7 @@ public class ContactResolver {
             // if the object is reported to be involved in a collision, check for collision exit
             boolean contactingBefore = contactState == ContactState.ENTER || contactState == ContactState.STAY;
             // if the objects were contacting previously, and are no longer, emit a collisionExitEvent
-            if (contactingBefore && ColliderComponent.areContacting(g, entry.getKey()) == null) {
+            if (contactingBefore && g != entry.getKey() && ColliderComponent.areContacting(g, entry.getKey()) == null) {
                 contactStateMap.put(entry.getKey(), ContactState.NONE);
                 game().emit(new CollisionExitEvent(g, entry.getKey()));
             }
