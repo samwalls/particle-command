@@ -14,8 +14,8 @@ public class GravityRegionObject extends GameObject {
     public GravityRegionObject() {
         super();
         collider.setIsTrigger(true);
-        collider.setType(ColliderType.CIRCLE);
-        collider.setBoundingBox(AABB.circle(10f));
+        collider.setType(ColliderType.BOX);
+        collider.setBoundingBox(AABB.box(10f, 10f));
         physics().setKinematic(true);
     }
 
@@ -30,8 +30,9 @@ public class GravityRegionObject extends GameObject {
         game().stroke(0, 0);
         game().fill(255f, 255f, 255f, 127f);
         PVector p = globalPosition();
-        float size = collider.outerRadius() * 2;
-        game().ellipse(p.x, p.y, size, size);
+        AABB bb = collider.getBoundingBox();
+        game().translate(p.x, p.y);
+        game().rect(bb.min.x, bb.min.y, bb.width(), bb.height());
         game().popMatrix();
         game().pushMatrix();
         game().stroke(0, 255, 0);
@@ -43,12 +44,14 @@ public class GravityRegionObject extends GameObject {
 
     @Override
     public void onCollisionEnter(Contact contact) {
-        attractToCentre(contact.B());
+        GameObject other = contact.A() != this ? contact.A() : contact.B();
+        attractToCentre(other);
     }
 
     @Override
     public void onCollisionStay(Contact contact) {
-        attractToCentre(contact.B());
+        GameObject other = contact.A() != this ? contact.A() : contact.B();
+        attractToCentre(other);
     }
 
     private void attractToCentre(GameObject other) {

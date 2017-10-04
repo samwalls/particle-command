@@ -24,8 +24,6 @@ public class MainComponent extends GameManager {
     static final float MASS_MIN = 1f;
     static final float MASS_MAX = 100;
 
-    private List<BasicObject> basicObjects = new ArrayList<>();
-
     private float mousePressX, mousePressY;
 
     private BasicObject star;
@@ -33,8 +31,8 @@ public class MainComponent extends GameManager {
     private GameObject parentObject;
 
     public void settings() {
-//        fullScreen();
-        size(1940, 1080);
+        fullScreen();
+        size(displayWidth, displayHeight);
     }
 
     public void setup() {
@@ -50,7 +48,7 @@ public class MainComponent extends GameManager {
 //        }
         GameObject gravityRegion = new GravityRegionObject();
         gravityRegion.setParent(parentObject);
-        gravityRegion.collider().setBoundingBox(AABB.circle(100f));
+        gravityRegion.collider().setBoundingBox(AABB.box(100f, 100f));
         game().setRenderingLayers(Arrays.asList(
                 "background",
                 "particle",
@@ -73,14 +71,19 @@ public class MainComponent extends GameManager {
     }
 
     public void mouseReleased() {
-        BasicObject g = new BasicObject(random(MASS_MIN, MASS_MAX), ColliderType.CIRCLE);
+        GameObject g;
+        if (mouseButton == LEFT) {
+            g = new BasicObject(random(MASS_MIN, MASS_MAX), ColliderType.CIRCLE);
+            g.collider().setBoundingBox(AABB.circle(20f));
+        } else if (mouseButton == RIGHT)
+            g = new BoxObject(random(MASS_MIN, MASS_MAX));
+        else {
+            return;
+        }
         g.setParent(parentObject);
-        g.collider().setBoundingBox(AABB.circle(20f));
         g.setPosition(g.toRotationalFrame(g.toReferenceFrame(new PVector(mousePressX, mousePressY))));
         // make the object move with respect to the change in position since mouse press
         g.physics().applyForce(new PVector(mouseX - mousePressX, mouseY - mousePressY).mult(0.1f), ForceType.VELOCITY);
-        g.setInteractiveObjects(basicObjects);
-        basicObjects.add(g);
     }
 
     public void keyPressed() {
@@ -104,6 +107,5 @@ public class MainComponent extends GameManager {
         star = new BasicObject(1000f, ColliderType.CIRCLE);
         star.physics().setKinematic(false);
         star.physics().setPosition(new PVector(width / 2, height / 2));
-        basicObjects.add(star);
     }
 }

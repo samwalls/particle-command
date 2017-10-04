@@ -19,10 +19,10 @@ public class BasicObject extends GameObject {
 
     static final float GRAVITY_COEFFICIENT = 1;
 
-    private static final float topBound = game().height / 2f - 200;
-    private static final float bottomBound = -game().height / 2f + 200;
-    private static final float leftBound = -game().width / 2f + 700;
-    private static final float rightBound = game().width / 2f - 700;
+    private static final float topBound = game().height / 2f - 100;
+    private static final float bottomBound = -game().height / 2f + 100;
+    private static final float leftBound = -game().width / 2f + 300;
+    private static final float rightBound = game().width / 2f - 300;
 
     private List<BasicObject> interactiveObjects = new ArrayList<>();
 
@@ -32,7 +32,7 @@ public class BasicObject extends GameObject {
     // map of things this object is touching, to the number of frames they have been touching for
     private Map<GameObject, Integer> touching = new HashMap<>();
 
-    private PVector colour;
+    protected PVector colour;
 
     public BasicObject(float mass, ColliderType colliderType) {
         super(colliderType);
@@ -73,7 +73,7 @@ public class BasicObject extends GameObject {
 
     @Override
     public void onCollisionStay(Contact contact) {
-        GameObject other = contact.B();
+        GameObject other = contact.A() != this ? contact.A() : contact.B();
         if (!touching.containsKey(other))
             touching.put(other, 0);
         touching.put(other, touching.get(other) + 1);
@@ -183,7 +183,7 @@ public class BasicObject extends GameObject {
 
     private void resolveCollisions() {
         PVector p = position();
-        float radius = collider.outerRadius();
+        float radius = collider.innerRadius();
         boolean left = p.x <= leftBound + radius;
         boolean right = p.x >= rightBound - radius;
         boolean bottom = p.y <= bottomBound + radius;
