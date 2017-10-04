@@ -13,8 +13,6 @@ import static engine.common.component.GameManager.game;
 
 public class GameObject extends Component {
 
-    private static final float MAX_SIZE = 100f;
-
     protected PhysicsComponent physics;
 
     protected ColliderComponent collider;
@@ -41,20 +39,20 @@ public class GameObject extends Component {
 
     //******** PUBLIC METHODS ********//
 
-    // public property based on the mass of the object
-    public float size() {
-        return game().max(1, game().min(0.5f * physics().getMass(), MAX_SIZE));
-    }
-
-    // public access to this object's physics
     public PhysicsComponent physics() {
         return physics;
+    }
+
+    public ColliderComponent collider() {
+        return collider;
     }
 
     //******** PROTECTED METHODS ********//
 
     protected void renderRelativeLine(PVector v) {
-        game().line(physics().getPosition().x, physics().getPosition().y, physics().getPosition().x + v.x, physics().getPosition().y + v.y);
+        PVector o = globalPosition();
+        PVector p = o.copy().add(v);
+        game().line(o.x, o.y, p.x, p.y);
     }
 
     //******** PACKAGE-LOCAL METHODS ********//

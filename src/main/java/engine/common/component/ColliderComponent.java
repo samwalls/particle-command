@@ -10,6 +10,8 @@ public class ColliderComponent extends Component {
 
     private ColliderType type = ColliderType.NONE;
 
+    private AABB boundingBox = new AABB();
+
     /**
      * When isTrigger is true, the object does not physically respond to contacts, collision events like
      * onCollisionEnter, onCollisionStay, and onCollisionExit are still performed however. This makes the collider act
@@ -19,6 +21,7 @@ public class ColliderComponent extends Component {
 
     public ColliderComponent(Component parent) throws IllegalArgumentException {
         super(parent);
+        boundingBox.setParent(this);
     }
 
     public ColliderComponent(Component parent, ColliderType type) {
@@ -28,6 +31,23 @@ public class ColliderComponent extends Component {
 
     public ColliderComponent() {
         this(null, ColliderType.NONE);
+    }
+
+    public float outerRadius() {
+        return boundingBox.outerRadius();
+    }
+
+    public float innerRadius() {
+        return boundingBox.innerRadius();
+    }
+
+    public AABB getBoundingBox() {
+        return boundingBox;
+    }
+
+    public void setBoundingBox(AABB boundingBox) {
+        this.boundingBox = boundingBox;
+        this.boundingBox.setParent(this);
     }
 
     public ColliderType type() {
@@ -75,18 +95,18 @@ public class ColliderComponent extends Component {
     private static Contact[] circleIsContacting(GameObject circle, GameObject other) {
         switch (other.collider.type()) {
             case CIRCLE:
-                PVector displacement = circle.physics().getPosition().copy().sub(other.physics().getPosition());
-                float r1 = circle.size() / 2f;
-                float r2 = other.size() / 2f;
+                PVector displacement = circle.physics().globalPosition().sub(other.physics().globalPosition());
+                float r1 = circle.collider.outerRadius();
+                float r2 = other.collider.outerRadius();
                 boolean coinciding = r1 + r2 >= displacement.mag();
                 if (coinciding) {
                     // the normal points towards the other object
-                    PVector contactNormal = other.physics().getPosition().copy();
-                    contactNormal.sub(circle.physics().getPosition());
+                    PVector contactNormal = other.physics().globalPosition();
+                    contactNormal.sub(circle.physics().globalPosition());
                     contactNormal.normalize();
                     float interpenetration = r1 + r2 - displacement.mag();
                     return new Contact[] {
-                            new CircleCollision(contactNormal, interpenetration, circle, other, 0.5f),
+                            new CircleCollision(contactNormal, interpenetration, circle, other, 0.2f),
                             new CircleContact(contactNormal, interpenetration, circle, other),
                     };
                 }

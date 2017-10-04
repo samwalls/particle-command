@@ -9,7 +9,7 @@ public class Component extends RelativeTransform implements Drawable, Updatable,
 
     protected Transform transform;
 
-    public Component(Component parent) throws IllegalArgumentException {
+    public Component(Component parent) throws RelativeTransformCycleException {
         super(parent);
         transform = new Transform();
     }

@@ -19,6 +19,11 @@ public class BasicObject extends GameObject {
 
     static final float GRAVITY_COEFFICIENT = 1;
 
+    private static final float topBound = game().height / 2f - 200;
+    private static final float bottomBound = -game().height / 2f + 200;
+    private static final float leftBound = -game().width / 2f + 700;
+    private static final float rightBound = game().width / 2f - 700;
+
     private List<BasicObject> interactiveObjects = new ArrayList<>();
 
     private ArrayDeque<PVector> trailPositions = new ArrayDeque();
@@ -58,6 +63,7 @@ public class BasicObject extends GameObject {
     public void onRender() {
 //        renderTrail();
         renderParticle();
+        renderDebug();
     }
 
     @Override
@@ -87,9 +93,9 @@ public class BasicObject extends GameObject {
         // draw the particle as a circle
         game().pushMatrix();
         game().fill(colour.x, colour.y, colour.z);
-        float radius = size() / 2;
         game().stroke(0, 0);
-        game().ellipse(p.x, p.y, radius * 2, radius * 2);
+        float size = collider.outerRadius() * 2;
+        game().ellipse(p.x, p.y, size, size);
         game().rotate(globalRotation());
         game().popMatrix();
         renderTouching();
@@ -109,7 +115,7 @@ public class BasicObject extends GameObject {
 
     private void renderTrail() {
         game().pushMatrix();
-        PVector p = physics().getPosition();
+        PVector p = globalPosition();
         game().stroke(0);
         game().strokeWeight(1);
         game().fill(colour.x, colour.y, colour.z);
@@ -133,7 +139,8 @@ public class BasicObject extends GameObject {
                     PVector strokeColour = new PVector(colour.x, colour.y, colour.z);
                     strokeColour.mult(5f / i);
                     game().stroke(strokeColour.x, strokeColour.y, strokeColour.z);
-                    float trailWidth = 0.8f * (size() - physics().getVelocity().mag() * (i / size()));
+                    float radius = collider.outerRadius();
+                    float trailWidth = 0.8f * (radius - physics().getVelocity().mag() * (i / radius));
                     game().strokeWeight(trailWidth >= 0 ? trailWidth : 0);
                     game().line(a.x, a.y, b.x, b.y);
                 }
@@ -171,26 +178,28 @@ public class BasicObject extends GameObject {
 
     private void renderInformationDebug() {
         game().fill(255, 255, 255);
-        game().text(physics().getMass(), physics().getPosition().x, physics().getPosition().y);
+        game().text(position().toString(), globalPosition().x, globalPosition().y);
     }
 
     private void resolveCollisions() {
-        PVector p = physics().getPosition();
-        float radius = size() / 2;
-        boolean isXOver = p.x <= radius || p.x >= game().width - radius;
-        boolean isYOver = p.y <= radius || p.y >= game().height - radius;
-        if (isXOver || isYOver) {
+        PVector p = position();
+        float radius = collider.outerRadius();
+        boolean left = p.x <= leftBound + radius;
+        boolean right = p.x >= rightBound - radius;
+        boolean bottom = p.y <= bottomBound + radius;
+        boolean top = p.y >= topBound - radius;
+        if (left || right || top || bottom) {
             PVector contactPosition = new PVector(
-                    p.x <= radius ? radius : (p.x >= game().width - radius ? game().width - radius : p.x),
-                    p.y <= radius ? radius : (p.y >= game().height - radius ? game().height - radius : p.y)
+                    left ? leftBound + radius : (right ? rightBound - radius : p.x),
+                    bottom ? bottomBound + radius : (top ? topBound - radius : p.y)
             );
-            PVector reflectiveVelocity = physics().getPosition().copy().sub(contactPosition);
-            physics().setPosition(contactPosition);
+            PVector reflectiveVelocity = p.copy().sub(contactPosition);
+            setPosition(contactPosition);
             // the floor produces an inelastic collision (slight dampening in outcome velocity)
-            if (isXOver) {
+            if (left || right) {
                 reflectiveVelocity.x *= -WALL_ELASTICITY;
             }
-            if (isYOver) {
+            if (top || bottom) {
                 reflectiveVelocity.y *= -WALL_ELASTICITY;
             }
             physics().applyForce(reflectiveVelocity, ForceType.VELOCITY);
@@ -210,6 +219,6 @@ public class BasicObject extends GameObject {
 //                physics().applyForce(gravity);
 //            }
 //        }
-        physics().applyForce(new PVector(0, GRAVITY_COEFFICIENT), ForceType.ACCELERATION);
+        physics().applyForce(toRotationalFrame(new PVector(0, GRAVITY_COEFFICIENT)), ForceType.ACCELERATION);
     }
 }

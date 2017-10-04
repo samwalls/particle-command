@@ -1,6 +1,6 @@
 package game;
 
-import engine.common.component.Component;
+import engine.common.component.AABB;
 import engine.common.component.GameObject;
 import engine.common.physics.ForceType;
 import engine.common.component.GameManager;
@@ -30,23 +30,27 @@ public class MainComponent extends GameManager {
 
     private BasicObject star;
 
-    private GameObject parentObject = new GameObject();
+    private GameObject parentObject;
 
     public void settings() {
-        fullScreen();
-//        size(1940, 1080);
+//        fullScreen();
+        size(1940, 1080);
     }
 
     public void setup() {
         frameRate(60);
-//        initStar();
-        for (int i = 0; i < 150; i++) {
-            GameObject g = new BasicObject(100, ColliderType.CIRCLE);
-            g.setPosition(new PVector(random(g.size(), width - g.size()), random(g.size(), height - g.size())));
-            g.setParent(parentObject);
-        }
+        parentObject = new GameObject();
+        parentObject.setPosition(new PVector(width / 2f, height / 2f));
+//        for (int i = 0; i < 150; i++) {
+//            GameObject g = new BasicObject(100, ColliderType.CIRCLE);
+//            float radius = 20f;
+//            g.collider().setBoundingBox(AABB.circle(radius));
+//            g.setParent(parentObject);
+//            g.setPosition(new PVector(random(-width/2f + radius, width/2f - radius), random(height/2f + radius, height/2f - radius)));
+//        }
         GameObject gravityRegion = new GravityRegionObject();
-        gravityRegion.setPosition(new PVector(width/2f, height/2f));
+        gravityRegion.setParent(parentObject);
+        gravityRegion.collider().setBoundingBox(AABB.circle(100f));
         game().setRenderingLayers(Arrays.asList(
                 "background",
                 "particle",
@@ -65,17 +69,28 @@ public class MainComponent extends GameManager {
     public void mouseDragged() {
         PVector mouseDelta = new PVector(mouseX - mousePressX, mouseY - mousePressY);
         mouseDelta.mult(1f);
-        parentObject.setPosition(parentPreviousPosition.copy().add(mouseDelta));
+//        parentObject.setPosition(parentPreviousPosition.copy().add(mouseDelta));
     }
 
     public void mouseReleased() {
         BasicObject g = new BasicObject(random(MASS_MIN, MASS_MAX), ColliderType.CIRCLE);
         g.setParent(parentObject);
-        g.setPosition(new PVector(mousePressX, mousePressY));
+        g.collider().setBoundingBox(AABB.circle(20f));
+        g.setPosition(g.toRotationalFrame(g.toReferenceFrame(new PVector(mousePressX, mousePressY))));
         // make the object move with respect to the change in position since mouse press
         g.physics().applyForce(new PVector(mouseX - mousePressX, mouseY - mousePressY).mult(0.1f), ForceType.VELOCITY);
         g.setInteractiveObjects(basicObjects);
         basicObjects.add(g);
+    }
+
+    public void keyPressed() {
+        float rot = 0.01f;
+        if (key == 'q') {
+            parentObject.setRotation(parentObject.rotation() + rot);
+        } else if (key == 'e') {
+            parentObject.setRotation(parentObject.rotation() - rot);
+        }
+        System.out.println("global rotation: " + parentObject.globalRotation() + " | local rotation: " + parentObject.rotation());
     }
 
     public void draw() {

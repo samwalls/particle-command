@@ -52,6 +52,21 @@ public abstract class RelativeTransform implements Transformable {
         }
     }
 
+    public PVector toReferenceFrame(PVector v) {
+        PVector parentReferenceFrame = isRoot() ? new PVector() : parent().globalPosition();
+        return v.copy().sub(parentReferenceFrame);
+    }
+
+    public PVector toRotationalFrame(PVector v) {
+        PVector output = v.copy();
+        if (!isRoot()) {
+            // subtract this object's parent's rotation to interpret this vector in the rotational frame of this object
+            output.x = output.x * game().cos(-parent.globalRotation()) - output.y * game().sin(-parent.globalRotation());
+            output.y = output.y * game().sin(-parent.globalRotation()) + output.y * game().cos(-parent.globalRotation());
+        }
+        return output;
+    }
+
     /**
      * @return the position relative to the parent (if any, otherwise, should be the same as position())
      */
