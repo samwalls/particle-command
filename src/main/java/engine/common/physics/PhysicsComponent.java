@@ -28,19 +28,17 @@ public class PhysicsComponent extends Component {
             velocity.add(acceleration);
             setPosition(position().add(velocity));
             integrated = true;
+            acceleration.x = 0;
+            acceleration.y = 0;
         }
     }
 
     public void applyForce(PVector force, ForceType type) {
-        // TODO, find a way of converting the input force to the relevant vector relative to the parent...
-        // ...currently, if rotation is implemented, the input vector is still assumed to be relative to the parent
         if (force == null || !isKinematic) {
             return;
         }
         if (integrated) {
             integrated = false;
-            acceleration.x = 0;
-            acceleration.y = 0;
         }
         PVector f = new PVector(force.x, force.y);
         switch (type) {
