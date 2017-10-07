@@ -8,9 +8,9 @@ import static engine.common.component.GameManager.game;
 
 public abstract class RelativeTransform implements Transformable {
 
-    private RelativeTransform parent, root;
+    protected RelativeTransform parent, root;
 
-    private Set<RelativeTransform> children;
+    protected Set<RelativeTransform> children;
 
     public RelativeTransform(RelativeTransform parent) throws RelativeTransformCycleException {
         setParent(parent);
@@ -24,13 +24,13 @@ public abstract class RelativeTransform implements Transformable {
         return parent;
     }
 
-    public void setParent(RelativeTransform parent) throws RelativeTransformCycleException {
+    private void setParent(RelativeTransform parent) throws RelativeTransformCycleException {
         for (RelativeTransform ptr = this; ptr != null; ptr = ptr.parent()) {
             if (parent == ptr)
                 throw new IllegalArgumentException("attempt to set parent on relative transform would cause cycle");
         }
         this.parent = parent;
-        for (RelativeTransform ptr = this; ptr.parent() != null; ptr = ptr.parent())
+        for (RelativeTransform ptr = this; ptr != null; ptr = ptr.parent())
             if (ptr.parent() == null)
                 this.root = ptr;
     }

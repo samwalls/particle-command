@@ -20,7 +20,7 @@ public class ColliderComponent extends Component {
 
     public ColliderComponent(Component parent) throws IllegalArgumentException {
         super(parent);
-        boundingBox.setParent(this);
+        this.addChild(boundingBox);
     }
 
     public ColliderComponent(Component parent, ColliderType type) {
@@ -46,7 +46,7 @@ public class ColliderComponent extends Component {
 
     public void setBoundingBox(AABB boundingBox) {
         this.boundingBox = boundingBox;
-        this.boundingBox.setParent(this);
+        this.addChild(this.boundingBox);
     }
 
     public ColliderType type() {
