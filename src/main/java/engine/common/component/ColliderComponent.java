@@ -118,7 +118,7 @@ public class ColliderComponent extends Component {
     }
 
     private static Contact[] circleContactingCircle(GameObject circle, GameObject other) {
-        PVector displacement = circle.physics().globalPosition().sub(other.physics().globalPosition());
+        PVector displacement = circle.collider.globalPosition().sub(other.collider.globalPosition());
         float r1 = circle.collider.outerRadius();
         float r2 = other.collider.outerRadius();
         boolean coinciding = r1 + r2 >= displacement.mag();
@@ -139,8 +139,8 @@ public class ColliderComponent extends Component {
     private static Contact[] circleContactingBox(GameObject circle, GameObject box) {
         // the following case is adapted from https://yal.cc/rectangle-circle-intersection-test/ to suit the
         // needs of the engine
-        PVector pC = circle.physics().globalPosition();
-        PVector pB = box.physics().globalPosition();
+        PVector pC = circle.collider.globalPosition();
+        PVector pB = box.collider.globalPosition();
         float boxWidth = box.collider.boundingBox.width();
         float boxHeight = box.collider.boundingBox.height();
         PVector nearestPoint = new PVector(

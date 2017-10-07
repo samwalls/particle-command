@@ -20,7 +20,7 @@ public class CircleCollision extends Collision {
         // if the total mass is infinite we don't need to do anything
         if (totalInverseMass <= 0)
             return;
-        float separatingVelocity = relativeVelocity.dot(A.physics().getPosition().sub(B.physics().getPosition()).normalize());
+        float separatingVelocity = relativeVelocity.dot(A.physics().globalPosition().sub(B.physics().globalPosition()).normalize());
         // if the objects are moving away from each other (or not moving) we don't need to do anything
         if (separatingVelocity >= 0)
             return;
