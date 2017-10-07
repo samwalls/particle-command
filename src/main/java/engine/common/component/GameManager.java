@@ -2,6 +2,7 @@ package engine.common.component;
 
 import engine.common.event.*;
 import processing.core.PApplet;
+import processing.core.PVector;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -15,6 +16,7 @@ public class GameManager extends PApplet {
 
     private EventManager eventManager;
     private List<GameObject> gameObjects = new ArrayList<>();
+    private List<GameObject> gameObjectsToRemove = new ArrayList<>();
     private List<String> renderLayers = new ArrayList<>();
     private boolean defaultRenderLayerDefined = false;
 
@@ -41,6 +43,7 @@ public class GameManager extends PApplet {
     //******** PUBLIC METHODS ********//
 
     public void updateAll() {
+        cleanup();
         game().emit(new UpdateEvent());
         contactResolver.resolveAll();
         for (GameObject g : all())
@@ -48,7 +51,7 @@ public class GameManager extends PApplet {
         renderAll();
     }
 
-    void on(Class<? extends Event> type, Consumer<Event> consumer) {
+    public void on(Class<? extends Event> type, Consumer<Event> consumer) {
         eventManager.on(type, consumer);
     }
 
@@ -56,8 +59,12 @@ public class GameManager extends PApplet {
      * Emit the specified event
      * @param event the event to emit to listeners of the type of event emitted
      */
-    void emit(Event event) {
+    public void emit(Event event) {
         eventManager.emit(event);
+    }
+
+    public void removeEvent(Consumer<Event> consumer) {
+        eventManager.remove(consumer);
     }
 
     public Iterable<GameObject> all() {
@@ -76,10 +83,21 @@ public class GameManager extends PApplet {
         return Collections.unmodifiableCollection(renderLayers);
     }
 
+    public PVector rotate(PVector v, float rotation) {
+        return new PVector(
+                v.x * cos(rotation) - v.x * sin(rotation),
+                v.y * sin(rotation) + v.y * cos(rotation)
+        );
+    }
+
     //******** PACKAGE-LOCAL METHODS ********//
 
-    void add(GameObject go) {
-        gameObjects.add(go);
+    void add(GameObject g) {
+        gameObjects.add(g);
+    }
+
+    void remove(GameObject g) {
+        gameObjectsToRemove.add(g);
     }
 
     //******** PRIVATE METHODS ********//
@@ -94,5 +112,12 @@ public class GameManager extends PApplet {
             game().emit(new RenderEvent());
         for (String layer : renderLayers)
             game().emit(new RenderEvent(layer));
+    }
+
+    private void cleanup() {
+        if (gameObjectsToRemove.size() > 0) {
+            gameObjects.removeAll(gameObjectsToRemove);
+            gameObjectsToRemove = new ArrayList<>();
+        }
     }
 }
