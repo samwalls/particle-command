@@ -92,6 +92,6 @@ public class Explosion extends GameObject {
     }
 
     private void updateColliderZone() {
-        collider.setBoundingBox(AABB.circle(energy * game().sin(period())));
+        collider.getBoundingBox().updateSize(energy * game().sin(period()));
     }
 }

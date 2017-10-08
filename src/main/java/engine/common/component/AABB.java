@@ -20,27 +20,42 @@ public class AABB extends Component {
         super(null);
     }
 
+    // static helpers to create circles and boxes of the correct size given certain properties
+
     public static AABB circle(float radius) {
-        float side = radius * game().sin(game().QUARTER_PI);
         AABB result = new AABB();
-        result.min.x = -side;
-        result.min.y = -side;
-        result.max.x = side;
-        result.max.y = side;
+        result.updateSize(radius);
         return result;
     }
 
     public static AABB box(float width, float height) {
         AABB result = new AABB();
-        result.min = new PVector (
-                -width / 2f,
-                -height / 2f
-        );
-        result.max = new PVector(
-                width / 2f,
-                height / 2f
-        );
+        result.updateSize(width, height);
         return result;
+    }
+
+    /**
+     * Adjust the size of the bounding box to suit a single radius
+     * @param radius the radius of the AABB
+     */
+    public void updateSize(float radius) {
+        float side = radius * game().sin(game().QUARTER_PI);
+        min.x = -side;
+        min.y = -side;
+        max.x = side;
+        max.y = side;
+    }
+
+    /**
+     * Adjust the size of the bounding box to suit a width and height
+     * @param width the width of the AABB
+     * @param height the height of the AABB
+     */
+    public void updateSize(float width, float height) {
+        min.x = -width / 2f;
+        min.y = -height / 2f;
+        max.x = width / 2f;
+        max.y = height / 2f;
     }
 
     public float width() {
