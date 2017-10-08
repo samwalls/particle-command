@@ -96,13 +96,11 @@ public class GameObject extends Component {
 
     /**
      * Destroy this GameObject, un-mapping all of it's events and removing it from the update loop, this cannot be undone.
-     * All children of this object will be given to the parent, if a parent exists.
      */
     public void destroy() {
         isDestroyed = true;
         game().remove(this);
         removeEventHandlers();
-        giveChildrenToParent();
         System.out.println(this.toString() + " was destroyed");
     }
 
