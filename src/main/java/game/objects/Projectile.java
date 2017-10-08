@@ -21,11 +21,13 @@ public class Projectile extends GameObject {
     private static final int TRAIL_PERIOD = 1;
     private static final int TRAIL_MAX = 20;
 
-    private static final float EXPLOSION_ENERGY = 250f;
+    private static final float EXPLOSION_ENERGY = 150f;
+
+    protected Color projectileColour = new Color(255, 0, 0, 255);
 
     private PlayArea playarea;
 
-    private float gravity = 0.1f;
+    private float gravity = 0.01f;
 
     private float dragK1, dragK2;
 
@@ -33,18 +35,16 @@ public class Projectile extends GameObject {
     private int trailFrameCounter = 0;
     private PVector lastTrailPos = new PVector();
 
-    private Color projectileColour = new Color(255, 0, 0, 255);
-
-    private Battery battery;
+    private Battery playerBattery;
 
     public Projectile(PlayArea playArea, Battery battery, ColliderType colliderType, float radius, float mass, float dk1, float dk2) {
         this.playarea = playArea;
-        this.battery = battery;
         physics().setMass(mass);
         collider().setType(colliderType);
         collider().setBoundingBox(AABB.circle(radius));
         this.dragK1 = dk1;
         this.dragK2 = dk2;
+        this.playerBattery = battery;
     }
 
     public Projectile(PlayArea playArea, Battery battery, float mass, float dk1, float dk2) {
@@ -86,22 +86,11 @@ public class Projectile extends GameObject {
         destroy();
     }
 
-    private GameObject other(Contact contact) {
+    protected GameObject other(Contact contact) {
         return contact.B() == this ? contact.A() : contact.B();
     }
 
-    private void reactToCollision(GameObject other) {
-        // direct hit on a turret, destroy it
-        if (battery.contains(other)) {
-            other.destroy();
-            battery.removeTurret((Turret)other);
-        }
-        if (!other.collider().isTrigger())
-            triggerExplosion();
-        applyForces(other);
-    }
-
-    private void applyForces(GameObject g) {
+    protected void applyForces(GameObject g) {
         // play area triggers regular forces
         if (g == playarea) {
             applyGravity();
@@ -179,4 +168,14 @@ public class Projectile extends GameObject {
         }
     }
 
+    private void reactToCollision(GameObject other) {
+        // direct hit on a turret, destroy it
+        if (playerBattery.contains(other)) {
+            other.destroy();
+            playerBattery.removeTurret((Turret)other);
+        }
+        if (!other.collider().isTrigger())
+            triggerExplosion();
+        applyForces(other);
+    }
 }

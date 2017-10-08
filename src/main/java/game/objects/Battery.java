@@ -10,9 +10,9 @@ import static game.MainComponent.game;
 
 public class Battery extends GameObject {
 
-    private List<Turret> turrets;
+    private List<PlayerTurret> turrets;
 
-    public Battery(List<Turret> turrets) {
+    public Battery(List<PlayerTurret> turrets) {
         this.turrets = turrets;
         if (this.turrets == null)
             this.turrets = new ArrayList<>();
@@ -21,11 +21,11 @@ public class Battery extends GameObject {
     /**
      * @return the closest turret to the mouse pointer; null if there are no turrets available
      */
-    public Turret closestTurret() {
-        Turret closest = null;
+    public PlayerTurret closestTurret() {
+        PlayerTurret closest = null;
         PVector mouse = new PVector(game().mouseX, game().mouseY);
         float minDistance = Float.POSITIVE_INFINITY;
-        for (Turret t : turrets) {
+        for (PlayerTurret t : turrets) {
             float distance = t.globalPosition().sub(mouse).mag();
             if (closest == null || distance < minDistance) {
                 closest = t;
@@ -35,7 +35,7 @@ public class Battery extends GameObject {
         return closest;
     }
 
-    public void addTurret(Turret turret) {
+    public void addTurret(PlayerTurret turret) {
         turrets.add(turret);
     }
 

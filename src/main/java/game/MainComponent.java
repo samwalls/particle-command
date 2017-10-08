@@ -26,6 +26,7 @@ public class MainComponent extends GameManager {
     private Floor floor;
     private Battery battery;
     private Pointer mousePointer;
+    private EnemyTurret enemyTurret;
 
     public void settings() {
 //        fullScreen();
@@ -48,6 +49,9 @@ public class MainComponent extends GameManager {
         parent.addChild(floor);
         parent.addChild(mousePointer);
         setupBattery(4);
+        enemyTurret = new EnemyTurret(playArea, battery, 0.1f);
+        enemyTurret.setPosition(new PVector(0, -height / 2f));
+        parent.addChild(enemyTurret);
     }
 
     public void mousePressed() {
@@ -61,9 +65,9 @@ public class MainComponent extends GameManager {
     }
 
     public void mouseReleased() {
-        Turret closest = battery.closestTurret();
+        PlayerTurret closest = battery.closestTurret();
         if (closest != null)
-            closest.emit(playArea, battery, Projectile.DEFAULT_RADIUS + Turret.TURRET_HEIGHT / 2f + 5f, 30f);
+            closest.fire(battery, Projectile.DEFAULT_RADIUS + Turret.TURRET_HEIGHT / 2f + 5f, 30f);
     }
 
     public void keyPressed() {
@@ -76,19 +80,11 @@ public class MainComponent extends GameManager {
         updateAll();
     }
 
-    private Projectile createProjectile(float x, float y, PVector v) {
-        Projectile p = new Projectile(playArea, battery, 10f, 0.01f, 0.0001f);
-        parent.addChild(p);
-        p.setPosition(playArea.toReferenceFrame(new PVector(x, y)));
-        p.physics().applyForce(p.toRotationalFrame(v.copy()), ForceType.VELOCITY);
-        return p;
-    }
-
     private void setupBattery(int nTurrets) {
         battery = new Battery(null);
         parent.addChild(battery);
         for (int i = 0; i < nTurrets; i++) {
-            Turret turret = new Turret();
+            PlayerTurret turret = new PlayerTurret(playArea);
             turret.setPosition(new PVector(-game().width / 2f + (i + 0.5f) * (game().width / nTurrets), Floor.FLOOR_HEIGHT + Turret.TURRET_HEIGHT));
             parent.addChild(turret);
             battery.addTurret(turret);

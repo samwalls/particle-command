@@ -1,6 +1,5 @@
 package game.objects;
 
-import engine.common.component.AABB;
 import engine.common.component.GameObject;
 import engine.common.physics.ColliderType;
 import engine.common.physics.Contact;
@@ -80,7 +79,7 @@ public class Explosion extends GameObject {
             PVector pressure = other.globalPosition().sub(globalPosition());
             float distance = pressure.mag();
             pressure.div(game().max(Float.MIN_VALUE, distance * distance));
-            pressure.mult(energy);
+            pressure.mult(power());
             other.physics().applyForce(pressure);
         }
     }
@@ -93,5 +92,9 @@ public class Explosion extends GameObject {
 
     private void updateColliderZone() {
         collider.getBoundingBox().updateSize(energy * game().sin(period()));
+    }
+
+    private float power() {
+        return energy * game().cos(period());
     }
 }
