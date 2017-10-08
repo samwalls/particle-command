@@ -86,8 +86,8 @@ public class GameManager extends PApplet {
 
     public PVector rotate(PVector v, float rotation) {
         return new PVector(
-                v.x * cos(rotation) - v.x * sin(rotation),
-                v.y * sin(rotation) + v.y * cos(rotation)
+                v.x * cos(rotation) - v.y * sin(rotation),
+                v.x * sin(rotation) + v.y * cos(rotation)
         );
     }
 
