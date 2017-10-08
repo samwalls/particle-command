@@ -16,6 +16,7 @@ public class GameManager extends PApplet {
 
     private EventManager eventManager;
     private List<GameObject> gameObjects = new ArrayList<>();
+    private List<GameObject> gameObjectsToAdd = new ArrayList<>();
     private List<GameObject> gameObjectsToRemove = new ArrayList<>();
     private List<String> renderLayers = new ArrayList<>();
     private boolean defaultRenderLayerDefined = false;
@@ -68,7 +69,7 @@ public class GameManager extends PApplet {
     }
 
     public Iterable<GameObject> all() {
-        return Collections.unmodifiableCollection(gameObjects);
+        return gameObjects;
     }
 
     public void setRenderingLayers(List<String> layers) {
@@ -93,7 +94,7 @@ public class GameManager extends PApplet {
     //******** PACKAGE-LOCAL METHODS ********//
 
     void add(GameObject g) {
-        gameObjects.add(g);
+        gameObjectsToAdd.add(g);
     }
 
     void remove(GameObject g) {
@@ -115,9 +116,14 @@ public class GameManager extends PApplet {
     }
 
     private void cleanup() {
+        // add objects that need to be added, remove those that need to be removed
+        if (gameObjectsToAdd.size() > 0) {
+            gameObjects.addAll(gameObjectsToAdd);
+            gameObjectsToAdd.clear();
+        }
         if (gameObjectsToRemove.size() > 0) {
             gameObjects.removeAll(gameObjectsToRemove);
-            gameObjectsToRemove = new ArrayList<>();
+            gameObjectsToRemove.clear();
         }
     }
 }

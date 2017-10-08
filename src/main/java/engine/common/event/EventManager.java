@@ -1,6 +1,7 @@
 package engine.common.event;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 public class EventManager implements EventEmitter, EventConsumer {
@@ -19,29 +20,26 @@ public class EventManager implements EventEmitter, EventConsumer {
     public void on(Class<? extends Event> type, Consumer<Event> consumer) {
         // register an event
         if (!registeredEvents.containsKey(type)) {
-            registeredEvents.put(type, new ArrayList<>());
+            // TODO CopyOnWriteArrayList might be inneficient in comparison to a normal ArrayList, look into it
+            registeredEvents.put(type, new CopyOnWriteArrayList<>());
         }
         registeredEvents.get(type).add(consumer);
     }
 
     public void emit(Event event) {
         cleanup();
-        List<Consumer<Event>> consumers = registeredEvents.get(event.getClass());
-        if (consumers == null)
-            return;
-        for (Consumer<Event> consumer : consumers)
+        for (Consumer<Event> consumer : registeredEvents.get(event.getClass()))
             consumer.accept(event);
     }
 
     public void remove(Consumer<Event> event) {
         // add to a list to be removed later, as to avoid ConcurrentModificationExceptions
-        for (Map.Entry<Class<? extends Event>, List<Consumer<Event>>> entry : registeredEvents.entrySet())
-            if (entry.getValue().contains(event)) {
-                if (!toRemove.containsKey(entry.getKey())) {
-                    toRemove.put(entry.getKey(), new ArrayList<>());
-                }
-                toRemove.get(entry.getKey()).add(event);
+        registeredEvents.entrySet().stream().filter(entry -> entry.getValue().contains(event)).forEach(entry -> {
+            if (!toRemove.containsKey(entry.getKey())) {
+                toRemove.put(entry.getKey(), new ArrayList<>());
             }
+            toRemove.get(entry.getKey()).add(event);
+        });
     }
 
     private void cleanup() {

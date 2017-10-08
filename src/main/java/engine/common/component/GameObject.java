@@ -100,9 +100,10 @@ public class GameObject extends Component {
      */
     public void destroy() {
         isDestroyed = true;
-        removeEventHandlers();
         game().remove(this);
+        removeEventHandlers();
         giveChildrenToParent();
+        System.out.println(this.toString() + " was destroyed");
     }
 
     //******** PROTECTED METHODS ********//
