@@ -15,6 +15,9 @@ public class Pointer extends GameObject {
         return RenderLayer.MOUSE.toString();
     }
 
+    /**
+     * Render a semi-transparent crosshair on the mouse position.
+     */
     @Override
     public void onRender() {
         game().pushStyle();

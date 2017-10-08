@@ -12,7 +12,7 @@ import static game.MainComponent.game;
 
 public class Floor extends GameObject {
 
-    public static final float FLOOR_HEIGHT = 300f;
+    public static final float FLOOR_HEIGHT = 250f;
     private static final float FLOOR_SIDE_PADDING = 300f;
 
     private Color groundColour = new Color(100, 100, 100, 255);

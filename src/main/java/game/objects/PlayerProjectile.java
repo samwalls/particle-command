@@ -26,7 +26,7 @@ public class PlayerProjectile extends Projectile {
         // explode if we hit the target
         // the requirement for exploding is defined as a radius around the original target
         // (proportional to the distance away to account for distant targets)
-        float threshold = TARGET_THRESHOLD_MINIMUM + (0.00001f * initialDistance * initialDistance);
+        float threshold = TARGET_THRESHOLD_MINIMUM + (0.00002f * initialDistance * initialDistance);
         if (target.copy().sub(globalPosition()).mag() <= threshold)
             triggerExplosion();
     }

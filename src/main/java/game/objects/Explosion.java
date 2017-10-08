@@ -15,14 +15,23 @@ public class Explosion extends GameObject {
 
     private static final float BLAST_MIN = 5f, BLAST_MAX = 1000f;
 
-    // number of frames an explosion takes to complete
+    /**
+     * number of frames an explosion takes to complete
+     */
     private static final float BLAST_PERIOD = MainComponent.FRAME_RATE * 2;
+
+    /**
+     * the amount of "power" (see power()) contributed towards outwards force in an explosion
+     */
+    private static final float PRESSURE_COEFFICIENT = 0.2f;
 
     private Color explosionColour;
 
     private float energy;
 
-    // updates passed since the explosion was created
+    /**
+     * updates passed since the explosion was created
+     */
     private int delta = 0;
 
     public Explosion(float energy, Color explosionColour) {
@@ -73,13 +82,17 @@ public class Explosion extends GameObject {
         applyForces(contact);
     }
 
+    public float power() {
+        return energy * game().cos(period());
+    }
+
     private void applyForces(Contact contact) {
         GameObject other = contact.B() == this ? contact.A() : contact.B();
         if (!other.collider().isTrigger()) {
             PVector pressure = other.globalPosition().sub(globalPosition());
             float distance = pressure.mag();
             pressure.div(game().max(Float.MIN_VALUE, distance * distance));
-            pressure.mult(power());
+            pressure.mult(power() * PRESSURE_COEFFICIENT);
             other.physics().applyForce(pressure);
         }
     }
@@ -92,9 +105,5 @@ public class Explosion extends GameObject {
 
     private void updateColliderZone() {
         collider.getBoundingBox().updateSize(energy * game().sin(period()));
-    }
-
-    private float power() {
-        return energy * game().cos(period());
     }
 }

@@ -84,8 +84,11 @@ public class MainComponent extends GameManager {
         battery = new Battery(null);
         parent.addChild(battery);
         for (int i = 0; i < nTurrets; i++) {
-            PlayerTurret turret = new PlayerTurret(playArea);
-            turret.setPosition(new PVector(-game().width / 2f + (i + 0.5f) * (game().width / nTurrets), Floor.FLOOR_HEIGHT + Turret.TURRET_HEIGHT));
+            PlayerTurret turret = new PlayerTurret(playArea, battery);
+            // distribute the turrets evenly among the ground
+            float x = -game().width / 2f + (i + 0.5f) * (game().width / nTurrets);
+            float y = height / 2f - Floor.FLOOR_HEIGHT / 2f - Turret.TURRET_HEIGHT / 2f;
+            turret.setPosition(new PVector(x, y));
             parent.addChild(turret);
             battery.addTurret(turret);
         }

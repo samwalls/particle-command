@@ -9,6 +9,7 @@ public enum RenderLayer {
     BACKGROUND("background"),
     DEFAULT(Component.DEFAULT_RENDER_LAYER),
     FLOOR("floor"),
+    TURRET("turret"),
     PROJECTILE("projectile"),
     MOUSE("mouse"),
     ;
