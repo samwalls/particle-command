@@ -15,7 +15,7 @@ import static game.MainComponent.game;
 
 public class Projectile extends GameObject {
 
-    private static final float DEFAULT_RADIUS = 10f;
+    public static final float DEFAULT_RADIUS = 10f;
     private static final float DEFAULT_MASS = 1f;
 
     private static final int TRAIL_PERIOD = 1;
@@ -35,8 +35,11 @@ public class Projectile extends GameObject {
 
     private Color projectileColour = new Color(255, 0, 0, 255);
 
-    public Projectile(PlayArea playArea, ColliderType colliderType, float radius, float mass, float dk1, float dk2) {
+    private Battery battery;
+
+    public Projectile(PlayArea playArea, Battery battery, ColliderType colliderType, float radius, float mass, float dk1, float dk2) {
         this.playarea = playArea;
+        this.battery = battery;
         physics().setMass(mass);
         collider().setType(colliderType);
         collider().setBoundingBox(AABB.circle(radius));
@@ -44,12 +47,12 @@ public class Projectile extends GameObject {
         this.dragK2 = dk2;
     }
 
-    public Projectile(PlayArea playArea, float mass, float dk1, float dk2) {
-        this(playArea, ColliderType.CIRCLE, DEFAULT_RADIUS, mass, dk1, dk2);
+    public Projectile(PlayArea playArea, Battery battery, float mass, float dk1, float dk2) {
+        this(playArea, battery, ColliderType.CIRCLE, DEFAULT_RADIUS, mass, dk1, dk2);
     }
 
-    public Projectile(PlayArea playArea) {
-        this(playArea, DEFAULT_MASS, 0, 0);
+    public Projectile(PlayArea playArea, Battery battery) {
+        this(playArea, battery, DEFAULT_MASS, 0, 0);
     }
 
     @Override
@@ -88,6 +91,11 @@ public class Projectile extends GameObject {
     }
 
     private void reactToCollision(GameObject other) {
+        // direct hit on a turret, destroy it
+        if (battery.contains(other)) {
+            other.destroy();
+            battery.removeTurret((Turret)other);
+        }
         if (!other.collider().isTrigger())
             triggerExplosion();
         applyForces(other);

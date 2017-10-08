@@ -7,7 +7,6 @@ import game.objects.*;
 import processing.core.PApplet;
 import processing.core.PVector;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public class MainComponent extends GameManager {
     private Universe universe;
     private PlayArea playArea;
     private Floor floor;
-    private Turret turret;
+    private Battery battery;
     private Pointer mousePointer;
 
     public void settings() {
@@ -41,16 +40,14 @@ public class MainComponent extends GameManager {
         playArea = new PlayArea();
         floor = new Floor();
         floor.setPosition(new PVector(0, height / 2f));
-        turret = new Turret();
-        turret.setPosition(new PVector(-200f, height / 2f - Floor.FLOOR_HEIGHT));
         mousePointer = new Pointer();
         parent = new GameObject();
         parent.setPosition(new PVector(width / 2f, height / 2f));
         parent.addChild(universe);
         parent.addChild(playArea);
         parent.addChild(floor);
-        parent.addChild(turret);
         parent.addChild(mousePointer);
+        setupBattery(4);
     }
 
     public void mousePressed() {
@@ -64,7 +61,9 @@ public class MainComponent extends GameManager {
     }
 
     public void mouseReleased() {
-        createProjectile(mousePressX, mousePressY, new PVector(mouseX - mousePressX, mouseY - mousePressY).mult(0.1f));
+        Turret closest = battery.closestTurret();
+        if (closest != null)
+            closest.emit(playArea, battery, Projectile.DEFAULT_RADIUS + Turret.TURRET_HEIGHT / 2f + 5f, 30f);
     }
 
     public void keyPressed() {
@@ -78,10 +77,21 @@ public class MainComponent extends GameManager {
     }
 
     private Projectile createProjectile(float x, float y, PVector v) {
-        Projectile p = new Projectile(playArea, 10f, 0.01f, 0.0001f);
+        Projectile p = new Projectile(playArea, battery, 10f, 0.01f, 0.0001f);
         parent.addChild(p);
         p.setPosition(playArea.toReferenceFrame(new PVector(x, y)));
         p.physics().applyForce(p.toRotationalFrame(v.copy()), ForceType.VELOCITY);
         return p;
+    }
+
+    private void setupBattery(int nTurrets) {
+        battery = new Battery(null);
+        parent.addChild(battery);
+        for (int i = 0; i < nTurrets; i++) {
+            Turret turret = new Turret();
+            turret.setPosition(new PVector(-game().width / 2f + (i + 0.5f) * (game().width / nTurrets), Floor.FLOOR_HEIGHT + Turret.TURRET_HEIGHT));
+            parent.addChild(turret);
+            battery.addTurret(turret);
+        }
     }
 }

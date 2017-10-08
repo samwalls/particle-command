@@ -12,17 +12,19 @@ import static game.MainComponent.game;
 
 public class Turret extends GameObject {
 
+    public static final float TURRET_WIDTH = 30f;
+    public static final float TURRET_HEIGHT = 50f;
+
     private static float MASS = 100f;
 
     private static final float TURRET_ROTATION_MIN = - game().QUARTER_PI;
     private static final float TURRET_ROTATION_MAX = game().QUARTER_PI;
 
-    private static final float TURRET_WIDTH = 30f;
-    private static final float TURRET_HEIGHT = 50f;
-
     private Color turretColour = new Color(140, 150, 140, 255);
 
     private float turretRotation = 0;
+
+    private boolean isOperational = false;
 
     public Turret() {
         physics.setMass(MASS);
@@ -44,17 +46,26 @@ public class Turret extends GameObject {
         this.turretRotation = game().min(TURRET_ROTATION_MIN, game().max(rotation, TURRET_ROTATION_MAX));
     }
 
-    public void emit(float initialSeparation, float speed) {
-        Projectile p = makeProjectile();
-        p.physics().applyForce(game().rotate(new PVector(0, -initialSeparation), turretRotation), ForceType.DISPLACEMENT);
-        p.physics().applyForce(game().rotate(new PVector(0, -speed), turretRotation), ForceType.VELOCITY);
+    public void emit(PlayArea playArea, Battery battery, float initialSeparation, float speed) {
+        Projectile projectile = makeProjectile(playArea, battery);
+        PVector p = globalPosition();
+        PVector mouse = new PVector(game().mouseX, game().mouseY);
+        PVector normal = mouse.sub(p).normalize();
+        projectile.setPosition(position());
+        projectile.physics().applyForce(normal.copy().mult(initialSeparation), ForceType.DISPLACEMENT);
+        projectile.physics().applyForce(normal.copy().mult(speed), ForceType.VELOCITY);
     }
 
-    private Projectile makeProjectile() {
+    public boolean isOperational() {
+        return isOperational;
+    }
+
+    private Projectile makeProjectile(PlayArea playArea, Battery battery) {
         // TODO
-        Projectile p = new Projectile(null);
+        Projectile p = new Projectile(playArea, battery);
         // the projectile is then a sibling of this
-        parent().addChild(p);
+        if (parent() != null)
+            parent().addChild(p);
         return p;
     }
 }
