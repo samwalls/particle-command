@@ -11,6 +11,7 @@ public enum RenderLayer {
     FLOOR("floor"),
     TURRET("turret"),
     PROJECTILE("projectile"),
+    TEXT("text"),
     MOUSE("mouse"),
     ;
 

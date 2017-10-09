@@ -13,7 +13,7 @@ public class Turret extends GameObject {
 
     private static float MASS = 100f;
 
-    protected Color turretColour = new Color(140, 150, 140, 255);
+    protected Color turretColour = new Color(200, 200, 200, 255);
 
     protected PlayArea playArea;
 

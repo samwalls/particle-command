@@ -10,12 +10,18 @@ import static game.MainComponent.game;
 
 public class Battery extends GameObject {
 
+    private Game game;
+
     private List<PlayerTurret> turrets;
 
-    public Battery(List<PlayerTurret> turrets) {
+    private int ammunition;
+
+    public Battery(Game game, List<PlayerTurret> turrets, int ammunition) {
+        this.game = game;
         this.turrets = turrets;
         if (this.turrets == null)
             this.turrets = new ArrayList<>();
+        this.ammunition = ammunition;
     }
 
     /**
@@ -35,6 +41,18 @@ public class Battery extends GameObject {
         return closest;
     }
 
+    public void fire() {
+        if (!game.isPlaying())
+            return;
+        PlayerTurret closest = closestTurret();
+        if (closest != null && getAmmunition() > 0) {
+            // deduct ammunition
+            ammunition--;
+            // create a projectile
+            closest.fire(this, Projectile.DEFAULT_RADIUS + Turret.TURRET_HEIGHT / 2f + 5f, 30f);
+        }
+    }
+
     public void addTurret(PlayerTurret turret) {
         turrets.add(turret);
     }
@@ -49,5 +67,13 @@ public class Battery extends GameObject {
 
     public boolean contains(GameObject turret) {
         return turrets.contains(turret);
+    }
+
+    public int size() {
+        return turrets.size();
+    }
+
+    public int getAmmunition() {
+        return ammunition;
     }
 }

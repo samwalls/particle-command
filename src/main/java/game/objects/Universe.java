@@ -6,6 +6,9 @@ import engine.common.physics.ColliderType;
 
 import static game.MainComponent.game;
 
+/**
+ * Trigger zone to detect when objects move too far from the play area.
+ */
 public class Universe extends GameObject {
 
     private static final float WIDTH_PADDING = 1000f;

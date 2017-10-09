@@ -21,14 +21,17 @@ public class EnemyTurret extends Turret {
 
     private final float spreadWidth = game().width - 200f;
 
+    private Game game;
     private Battery playerBattery;
+    private EnemyBattery enemyBattery;
     private float fireProbability = 0;
     private int fireDelta = 0;
 
     private int rotationDelta = 0;
 
-    public EnemyTurret(PlayArea playArea, Battery battery, float fireProbability) {
+    public EnemyTurret(Game game, PlayArea playArea, Battery battery, float fireProbability) {
         super(playArea);
+        this.game = game;
         this.fireProbability = fireProbability;
         this.playerBattery = battery;
         // the enemy turrets should not collide with each other
@@ -38,13 +41,9 @@ public class EnemyTurret extends Turret {
     }
 
     @Override
-    public void onRender() {
-        PVector p = globalPosition();
-        game().ellipse(p.x, p.y, 40, 40);
-    }
-
-    @Override
     public void onUpdate() {
+        if (!game.isPlaying())
+            return;
         PVector p = position();
         // move back and forth accross the width
         setPosition(new PVector(-game().sin(period()) * spreadWidth / 2f, p.y));
@@ -55,6 +54,10 @@ public class EnemyTurret extends Turret {
         }
     }
 
+    public void setEnemyBattery(EnemyBattery enemyBattery) {
+        this.enemyBattery = enemyBattery;
+    }
+
     private float period() {
         if (rotationDelta >= ROTATION_PERIOD)
             rotationDelta = 0;
@@ -62,7 +65,10 @@ public class EnemyTurret extends Turret {
     }
 
     private void potentiallyFire() {
-        if (fireProbability > 0 && new Random().nextInt((int)(1f/fireProbability)) == 0) {
+        if (fireProbability > 0 && new Random().nextInt((int)(1f/fireProbability)) == 0 && enemyBattery.getAmmunition() > 0) {
+            // remove ammunition reserve
+            enemyBattery.deductAmmunition();
+            // create and propel a projectile
             Projectile p = new EnemyProjectile(playArea, playerBattery);
             parent.addChild(p);
             p.setPosition(position());
@@ -71,7 +77,6 @@ public class EnemyTurret extends Turret {
             float coneHalfAngle = FIRE_CONE_ANGLE / 2f;
             v = game().rotate(v, game().random(-coneHalfAngle, coneHalfAngle));
             v.mult(game().random(FIRE_SPEED_MIN, FIRE_SPEED_MAX));
-            System.out.println(v);
             p.physics().applyForce(v, ForceType.VELOCITY);
         }
     }

@@ -43,7 +43,7 @@ public class PlayerTurret extends Turret {
         game().pushMatrix();
         PVector p = globalPosition();
         float factor = health / DEFAULT_HEALTH;
-        game().fill(turretColour.getRed() * factor, turretColour.getGreen() * factor, turretColour.getBlue() * factor, turretColour.getAlpha());
+        game().fill(turretColour.getRed() * (1f - factor), turretColour.getGreen() * factor, turretColour.getBlue() * factor, turretColour.getAlpha());
         game().rect(p.x - TURRET_WIDTH / 2f, p.y - TURRET_HEIGHT / 2f, TURRET_WIDTH, TURRET_HEIGHT);
         game().popMatrix();
         renderHealth();

@@ -13,6 +13,10 @@ import java.util.ArrayDeque;
 
 import static game.MainComponent.game;
 
+/**
+ * A basic implementation of a physics + drag + collision enabled entity; or "particle". The projectile renders a trail
+ * behind itself
+ */
 public class Projectile extends GameObject {
 
     public static final float DEFAULT_RADIUS = 10f;
@@ -33,7 +37,6 @@ public class Projectile extends GameObject {
 
     private ArrayDeque<PVector> trailPositions = new ArrayDeque<>();
     private int trailFrameCounter = 0;
-    private PVector lastTrailPos = new PVector();
 
     private Battery playerBattery;
 
@@ -74,6 +77,19 @@ public class Projectile extends GameObject {
     @Override
     public void onCollisionStay(Contact contact) {
         reactToCollision(other(contact));
+    }
+
+    private void reactToCollision(GameObject other) {
+        // direct hit on a turret, destroy it
+        if (playerBattery.contains(other)) {
+            other.destroy();
+            playerBattery.removeTurret((Turret)other);
+        }
+        // explode if the projectile hit something concrete
+        if (!other.collider().isTrigger())
+            triggerExplosion();
+        // apply regular forces
+        applyForces(other);
     }
 
     public void triggerExplosion() {
@@ -166,16 +182,5 @@ public class Projectile extends GameObject {
                 i++;
             }
         }
-    }
-
-    private void reactToCollision(GameObject other) {
-        // direct hit on a turret, destroy it
-        if (playerBattery.contains(other)) {
-            other.destroy();
-            playerBattery.removeTurret((Turret)other);
-        }
-        if (!other.collider().isTrigger())
-            triggerExplosion();
-        applyForces(other);
     }
 }
