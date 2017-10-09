@@ -48,9 +48,18 @@ public class Game extends GameObject {
     private StarField starField;
 
     /**
-     * The player's score.
+     * The player's current score.
      */
     private int score = 0;
+
+    /**
+     * The player's score in the previous wave.
+     */
+    private int scoreBefore = 0;
+
+    private int remainingTurretsBefore = 0;
+
+    private int remainingAmmunitionBefore = 0;
 
     /**
      * The current wave.
@@ -94,6 +103,9 @@ public class Game extends GameObject {
             // TODO display game over screen
             playing = false;
         } else if (levelOver()) {
+            scoreBefore = score;
+            remainingAmmunitionBefore = playerBattery.getAmmunition();
+            remainingTurretsBefore = playerBattery.size();
             applyScoreBonuses();
             increaseDifficultyConfiguration();
             playing = false;
@@ -147,7 +159,7 @@ public class Game extends GameObject {
     }
 
     private boolean levelOver() {
-        return enemyBattery.getAmmunition() <= 0;
+        return enemyBattery.getAmmunition() <= 0 && enemyBattery.destroyedProjectiles() >= enemyAmmunition;
     }
 
     private boolean gameOver() {
@@ -259,9 +271,22 @@ public class Game extends GameObject {
         float phase = infoScreenDelta * game().PI / (game().frameRate * 5);
         game().fill(0, 64 * game().sin(phase) + 191, 64 * game().sin(phase) + 191);
         game().text("Round " + wave + " Complete!", game().width / 2f, 100f);
+        // render score stats
+        float middle = game().height / 2f;
+        game().textSize(40f);
+        game().fill(0, 255, 255);
+        game().text("score before round: " + scoreBefore, game().width / 2f, middle - 100f);
+        game().text("--------------------", game().width / 2f, middle - 60f);
+        game().text("extra turrets " + remainingTurretsBefore + " (x " + remainingBatteryScoreBonus + "): " + remainingTurretsBefore * remainingBatteryScoreBonus, game().width / 2f, middle - 20f);
+        game().text("extra ammunition " + remainingAmmunitionBefore + " (x " + remainingAmmunitionScoreBonus + "): " + remainingAmmunitionBefore * remainingAmmunitionScoreBonus, game().width / 2f, middle + 20f);
+        float remaining = score - (scoreBefore + remainingTurretsBefore * remainingBatteryScoreBonus + remainingAmmunitionBefore * remainingAmmunitionScoreBonus);
+        game().text("other bonuses: " + remaining, game().width / 2f, middle + 60f);
+        game().text("--------------------", game().width / 2f, middle + 100f);
+        game().text("current score: " + score, game().width / 2f, middle + 140f);
+        // render help message
         game().textSize(50f);
         game().fill(255, 255, 255);
-        game().text("press any button to move to the next round", game().width / 2f, game().height / 2f);
+        game().text("press any button to move to the next round", game().width / 2f, game().height - 100f);
         game().popStyle();
         game().popMatrix();
         infoScreenDelta++;
@@ -284,8 +309,20 @@ public class Game extends GameObject {
     }
 
     private void renderStats() {
+        renderScore();
         renderAmmoStats();
         renderWaveProgress();
+    }
+
+    private void renderScore() {
+        game().pushMatrix();
+        game().pushStyle();
+        game().textAlign(game().CENTER);
+        game().textSize(60f);
+        game().fill(255, 255, 255, 127);
+        game().text("score: " + score, game().width / 2f, 100f);
+        game().popStyle();
+        game().popMatrix();
     }
 
     private void renderAmmoStats() {

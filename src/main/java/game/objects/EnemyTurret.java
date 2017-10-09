@@ -69,8 +69,9 @@ public class EnemyTurret extends Turret {
             // remove ammunition reserve
             enemyBattery.deductAmmunition();
             // create and propel a projectile
-            Projectile p = new EnemyProjectile(playArea, playerBattery);
+            EnemyProjectile p = new EnemyProjectile(playArea, playerBattery);
             parent.addChild(p);
+            enemyBattery.addProjectile(p);
             p.setPosition(position());
             p.physics().applyForce(new PVector(0, 5f), ForceType.DISPLACEMENT);
             PVector v = new PVector(0, 1);

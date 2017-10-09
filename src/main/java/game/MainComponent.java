@@ -17,7 +17,7 @@ public class MainComponent extends GameManager {
     public void settings() {
 //        fullScreen();
 //        size(1920, 1080);
-        size(1200, 1080);
+        size(1920, 1080);
     }
 
     public void setup() {

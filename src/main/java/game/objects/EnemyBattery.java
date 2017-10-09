@@ -12,10 +12,13 @@ public class EnemyBattery extends GameObject {
 
     private List<EnemyTurret> turrets;
 
+    private List<EnemyProjectile> activeProjectiles;
+
     private int ammunition;
 
     public EnemyBattery(int ammunition) {
         turrets = new ArrayList<>();
+        activeProjectiles = new ArrayList<>();
         this.ammunition = ammunition;
     }
 
@@ -39,5 +42,13 @@ public class EnemyBattery extends GameObject {
 
     public void deductAmmunition() {
         ammunition--;
+    }
+
+    public void addProjectile(EnemyProjectile p) {
+        activeProjectiles.add(p);
+    }
+
+    public long destroyedProjectiles() {
+        return activeProjectiles.stream().filter(GameObject::isDestroyed).count();
     }
 }

@@ -17,7 +17,7 @@ public class StarField extends GameObject {
     private static final int DEFAULT_AMOUNT = 300;
 
     private static final int BRIGHTNESS_MIN = 50;
-    private static final int PHASE_PERIOD = (int)(game().frameRate * 50f);
+    private static final int PHASE_PERIOD = (int)(game().frameRate * 30f);
 
     private Map<PVector, Integer> stars;
 

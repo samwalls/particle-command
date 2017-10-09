@@ -20,7 +20,10 @@ import static game.MainComponent.game;
 public class Projectile extends GameObject {
 
     public static final float DEFAULT_RADIUS = 10f;
-    private static final float DEFAULT_MASS = 1f;
+    public static final float DEFAULT_MASS = 1f;
+
+    private static final float DEFUALT_DRAG_K1 = 0.001f;
+    private static final float DEFAULT_DRAG_K2 = 0.000001f;
 
     private static final int TRAIL_PERIOD = 1;
     private static final int TRAIL_MAX = 20;
@@ -55,7 +58,7 @@ public class Projectile extends GameObject {
     }
 
     public Projectile(PlayArea playArea, Battery battery) {
-        this(playArea, battery, DEFAULT_MASS, 0, 0);
+        this(playArea, battery, DEFAULT_MASS, DEFUALT_DRAG_K1, DEFAULT_DRAG_K2);
     }
 
     @Override
