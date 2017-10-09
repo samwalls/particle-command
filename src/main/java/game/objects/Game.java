@@ -106,8 +106,8 @@ public class Game extends GameObject {
             wave++;
         }
         if (gameOver()) {
-            // TODO display game over screen
             playing = false;
+            // game over screen will now render instead of normal game-play
         } else if (levelOver()) {
             scoreBefore = score;
             remainingAmmunitionBefore = playerBattery.getAmmunition();
@@ -115,8 +115,9 @@ public class Game extends GameObject {
             applyScoreBonuses();
             increaseDifficultyConfiguration();
             playing = false;
+            // reset the game based on the updated parameters
             reset();
-            // TODO show stats of last wave, and wait for button press to continue
+            // level reset screen will now render instead of normal game-play
         }
     }
 

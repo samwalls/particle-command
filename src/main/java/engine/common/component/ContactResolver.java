@@ -11,8 +11,14 @@ import java.util.stream.Collectors;
 
 import static engine.common.component.GameManager.game;
 
+/**
+ * A helper class for detecting and resolving contacts.
+ */
 public class ContactResolver {
 
+    /**
+     * Detect and resolve all collisions for all game objects.
+     */
     public void resolveAll() {
         for (GameObject g : game().all().collect(Collectors.toList())) {
             resolveContacts(detectContacts(g));
@@ -48,6 +54,11 @@ public class ContactResolver {
         return contacts;
     }
 
+    /**
+     * React to an active contact detection.
+     * @param g the gameObject being detected for
+     * @param contact the contact defined by the detection
+     */
     private void handleActiveContact(GameObject g, Contact contact) {
         // TODO this method may generate multiple enter / stay events per frame, if multiple contacts are resolved for the same coincidence of objects (e.g. collision bounce + interpenetration resolution)
         GameObject other = contact.B();
@@ -75,6 +86,10 @@ public class ContactResolver {
         }
     }
 
+    /**
+     * Check if the given gameObject has any previous contacts that have left.
+     * @param g the GameObject to check for
+     */
     private void checkForCollisionExits(GameObject g) {
         Map<GameObject, ContactState> contactStateMap = g.getContactStateMap();
         for (Map.Entry<GameObject, ContactState> entry : contactStateMap.entrySet()) {

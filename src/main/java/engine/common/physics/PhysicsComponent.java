@@ -4,7 +4,13 @@ import engine.common.component.Component;
 import engine.common.component.Transform;
 import processing.core.PVector;
 
+/**
+ * The component type which handles all physics based interactions, including forces and kinematics.
+ */
 public class PhysicsComponent extends Component {
+
+    // we do not store values for "force", instead we simply keep acceleration and velocity (and the position, defined by
+    // the inhereted Transform in Component) - this is much simpler to conceptualize.
 
     private PVector velocity = new PVector();
     private PVector acceleration = new PVector();
@@ -20,6 +26,9 @@ public class PhysicsComponent extends Component {
         super(parent);
     }
 
+    /**
+     * Use the acceleration and kinematic quantities to derive the object's next position.
+     */
     public void integrate() {
         if (isKinematic) {
             // we're using "semi-implicit Euler integration" here
@@ -33,6 +42,16 @@ public class PhysicsComponent extends Component {
         }
     }
 
+    /**
+     * Apply a "force" vector to this object, in the manner defined by the force type (see {@link ForceType}). Note that
+     * strictly speaking this is an overloading of the term "force" - however, this is a convention modelled after
+     * Unity3D's method of applying various kinds of forces.
+     * <br><br>
+     * Internally, the force is resolved into the necessary change in position, velocity, or acceleration - these are the
+     * fundamental aspects of the
+     * @param force
+     * @param type
+     */
     public void applyForce(PVector force, ForceType type) {
         if (force == null || !isKinematic) {
             return;
@@ -40,6 +59,7 @@ public class PhysicsComponent extends Component {
         if (integrated) {
             integrated = false;
         }
+        // apply the "force" vector differently depending on the implied type
         PVector f = new PVector(force.x, force.y);
         switch (type) {
             case FORCE:
@@ -64,14 +84,25 @@ public class PhysicsComponent extends Component {
         }
     }
 
+    /**
+     * Apply a newtonian force on this object - i.e. the resulting acceleration is proportional to both the force and
+     * the mass of the object.
+     * @param v the force vector to apply
+     */
     public void applyForce(PVector v) {
         applyForce(v, ForceType.FORCE);
     }
 
+    /**
+     * @return the position of this object (relative to it's parent), as defined by it's transform.
+     */
     public PVector getPosition() {
         return transform.position();
     }
 
+    /**
+     * @return the velocity of this object (relative to it's parent).
+     */
     public PVector getVelocity() {
         return velocity.copy();
     }
@@ -119,10 +150,17 @@ public class PhysicsComponent extends Component {
         return v;
     }
 
+    /**
+     * @return true if this object reacts to forces.
+     */
     public boolean isKinematic() {
         return isKinematic;
     }
 
+    /**
+     * Set this physics configuration's kinematic state
+     * @param isKinematic the value to set this physics configuration's kinematic state to
+     */
     public void setKinematic(boolean isKinematic) {
         this.isKinematic = isKinematic;
     }

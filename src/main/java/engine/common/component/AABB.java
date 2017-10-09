@@ -58,18 +58,30 @@ public class AABB extends Component {
         max.y = height / 2f;
     }
 
+    /**
+     * @return the width of the bounding box
+     */
     public float width() {
         return max.x - min.x;
     }
 
+    /**
+     * @return the height of the bounding box
+     */
     public float height() {
         return max.y - min.y;
     }
 
+    /**
+     * @return the inner radius, defined as the maximum circle that fits within the bounding box
+     */
     public float innerRadius() {
         return game().max(width(), height()) / 2f;
     }
 
+    /**
+     * @return the outer radius, defined as the minimum circle that encompasses the entire bounding box
+     */
     public float outerRadius() {
         return (game().sqrt(width() * width() + height() * height())) / 2f;
     }

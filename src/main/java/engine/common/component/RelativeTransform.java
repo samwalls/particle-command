@@ -6,10 +6,27 @@ import java.util.*;
 
 import static engine.common.component.GameManager.game;
 
+/**
+ * An abstract base class which implemented the notion of inherited transform properties. E.g. all children have a global
+ * translation of the parent's global translation plus their own.
+ * <br><br>
+ * RelativeTransforms have links to their parent, as well as a list of their children.
+ */
 public abstract class RelativeTransform implements Transformable {
 
-    protected RelativeTransform parent, root;
+    /**
+     * The last known root of this RelativeTransform's hierarchy.
+     */
+    protected RelativeTransform root;
 
+    /**
+     * This RelativeTransform's parent (if it exists).
+     */
+    protected RelativeTransform parent;
+
+    /**
+     * This RelativeTransform's set of children.
+     */
     protected Set<RelativeTransform> children;
 
     public RelativeTransform(RelativeTransform parent) throws RelativeTransformCycleException {
@@ -24,6 +41,20 @@ public abstract class RelativeTransform implements Transformable {
         return parent;
     }
 
+    /**
+     * Add a child to this RelativeTransform, the child's parent will also be set to this.
+     * @param child the child to add
+     * @throws RelativeTransformCycleException if adding a child would cause a cyclical relationship
+     */
+    public void addChild(RelativeTransform child) throws RelativeTransformCycleException {
+        try {
+            child.setParent(this);
+        } catch (RelativeTransformCycleException e) {
+            throw new RelativeTransformCycleException("attempt to set parent in child to-be-added would cause cycle", e);
+        }
+        children.add(child);
+    }
+
     private void setParent(RelativeTransform parent) throws RelativeTransformCycleException {
         for (RelativeTransform ptr = this; ptr != null; ptr = ptr.parent()) {
             if (parent == ptr)
@@ -35,15 +66,6 @@ public abstract class RelativeTransform implements Transformable {
                 this.root = ptr;
     }
 
-    public void addChild(RelativeTransform child) throws RelativeTransformCycleException {
-        try {
-            child.setParent(this);
-        } catch (RelativeTransformCycleException e) {
-            throw new RelativeTransformCycleException("attempt to set parent in child to-be-added would cause cycle", e);
-        }
-        children.add(child);
-    }
-
     public void removeChild(RelativeTransform child) {
         if (children.contains(child)) {
             children.remove(child);
@@ -52,11 +74,21 @@ public abstract class RelativeTransform implements Transformable {
         }
     }
 
+    /**
+     * @param v the vector to transform
+     * @return the input vector, translated as if it were created as a child of this object (the global position still
+     * produces the same result, but it's translated in terms of this object's parent)
+     */
     public PVector toReferenceFrame(PVector v) {
         PVector parentReferenceFrame = isRoot() ? new PVector() : parent().globalPosition();
         return v.copy().sub(parentReferenceFrame);
     }
 
+    /**
+     * @param v the global-space vector to transform
+     * @return the input vector, rotated appropriately as if it were created as a child of this object (the global
+     * position still produces the same result, but it's translated in terms of this object's parent)
+     */
     public PVector toRotationalFrame(PVector v) {
         PVector output = v.copy();
         if (!isRoot()) {
@@ -68,7 +100,7 @@ public abstract class RelativeTransform implements Transformable {
     }
 
     /**
-     * @return the position relative to the parent (if any, otherwise, should be the same as position())
+     * @return the total position relative to the world
      */
     public PVector globalPosition() {
         Deque<RelativeTransform> path = new ArrayDeque<>();
@@ -103,7 +135,7 @@ public abstract class RelativeTransform implements Transformable {
     }
 
     /**
-     * @return the rotation relative to the parent (if any, otherwise, should be the same as rotation())
+     * @return the total rotation relative to the world
      */
     public float globalRotation() {
         float accumulator = rotation();
@@ -114,7 +146,7 @@ public abstract class RelativeTransform implements Transformable {
     }
 
     /**
-     * @return the scale relative to the parent (if any, otherwise, should be the same as scale())
+     * @return the total scale relative to the world
      */
     public PVector globalScale() {
         PVector accumulator = scale().copy();

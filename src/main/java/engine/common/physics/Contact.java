@@ -3,6 +3,9 @@ package engine.common.physics;
 import engine.common.component.GameObject;
 import processing.core.PVector;
 
+/**
+ * All the information required for a (potentially interpenetrating) contact between two GameObjects.
+ */
 public class Contact {
 
     protected GameObject A, B;

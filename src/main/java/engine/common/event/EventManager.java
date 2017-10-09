@@ -4,6 +4,9 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
+/**
+ * A container for mapping event types to sets of event handlers.
+ */
 public class EventManager implements EventEmitter, EventConsumer {
 
     private Map<Class<? extends Event>, List<Consumer<Event>>> registeredEvents;
@@ -17,6 +20,11 @@ public class EventManager implements EventEmitter, EventConsumer {
         toRemove = new HashMap<>();
     }
 
+    /**
+     * Map a new event handler to an event type
+     * @param type the type of event to map to
+     * @param consumer the event handler
+     */
     public void on(Class<? extends Event> type, Consumer<Event> consumer) {
         // register an event
         if (!registeredEvents.containsKey(type)) {
@@ -26,6 +34,10 @@ public class EventManager implements EventEmitter, EventConsumer {
         registeredEvents.get(type).add(consumer);
     }
 
+    /**
+     * Emit an event to all handles that are listening.
+     * @param event the event to emit
+     */
     public void emit(Event event) {
         cleanup();
         // TODO it _seems_ as though the performance issues are proportional to the number of registered events, not sure
@@ -37,6 +49,10 @@ public class EventManager implements EventEmitter, EventConsumer {
             consumer.accept(event);
     }
 
+    /**
+     * Remove an event mapping from the manager.
+     * @param event the event handler instance to remove
+     */
     public void remove(Consumer<Event> event) {
         // add to a list to be removed later, as to avoid ConcurrentModificationExceptions
         registeredEvents.entrySet().stream().filter(entry -> entry.getValue().contains(event)).forEach(entry -> {

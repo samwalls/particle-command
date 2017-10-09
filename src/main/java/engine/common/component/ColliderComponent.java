@@ -5,6 +5,9 @@ import processing.core.PVector;
 
 import static engine.common.component.GameManager.game;
 
+/**
+ * A class for managing various types of colliders, and their bounding boxes.
+ */
 public class ColliderComponent extends Component {
 
     private ColliderType type = ColliderType.NONE;
@@ -32,18 +35,33 @@ public class ColliderComponent extends Component {
         this(null, ColliderType.NONE);
     }
 
+    /**
+     * @return the outer radius of this collider's bounding box
+     * @see {@link AABB#outerRadius()}
+     */
     public float outerRadius() {
         return boundingBox.outerRadius();
     }
 
+    /**
+     * @return the inner radius of this collider's bounding box
+     * @see {@link AABB#innerRadius()}
+     */
     public float innerRadius() {
         return boundingBox.innerRadius();
     }
 
+    /**
+     * @return the AABB that defines the bounds of this collider
+     */
     public AABB getBoundingBox() {
         return boundingBox;
     }
 
+    /**
+     * Set the bounding box for this collider.
+     * @param boundingBox the bounding box to set to
+     */
     public void setBoundingBox(AABB boundingBox) {
         this.boundingBox = boundingBox;
         this.addChild(this.boundingBox);

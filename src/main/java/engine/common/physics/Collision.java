@@ -5,6 +5,9 @@ import processing.core.PVector;
 
 import static engine.common.component.GameManager.game;
 
+/**
+ * All the information required for a collision response between two GameObjects.
+ */
 public abstract class Collision extends Contact {
 
     protected float restitution = 0;

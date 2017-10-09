@@ -2,6 +2,10 @@ package engine.common.component;
 
 import processing.core.PVector;
 
+/**
+ * Contains all useful elements of a 2D transform: translation, rotation and scaling. Note that scaling is not
+ * implemented anywhere else in the engine as of yet.
+ */
 public class Transform implements Transformable {
 
     private PVector position = new PVector();

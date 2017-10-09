@@ -12,14 +12,29 @@ import java.util.function.Consumer;
 
 import static engine.common.component.GameManager.game;
 
+/**
+ * The building blocks upon which games are created. This class provides easy out-of-the box support for hooking into
+ * render, update, and collision events. As well as this, the object provides access to its current state of the physics
+ * and collider - and a <i>transform</i> for defining position, rotation etc..
+ * <br><br>
+ * As GameObject is a {@link Component} it also contains the notion of the {@link RelativeTransform} - i.e. that
+ * other GameObjects can be added as children, which inherit the parent's transform properties.
+ * @see {@link RelativeTransform}
+ */
 public class GameObject extends Component {
 
     protected PhysicsComponent physics;
 
     protected ColliderComponent collider;
 
+    /**
+     * The mapping of other GameObjects to the contact state between it and this.
+     */
     private Map<GameObject, ContactState> contactStateMap;
 
+    /**
+     * Has this GameObject been called to be removed?
+     */
     private boolean isDestroyed = false;
 
     // map game events to code supplied be the engine user
@@ -65,6 +80,7 @@ public class GameObject extends Component {
     public GameObject(GameObject parent, ColliderType colliderType) {
         super(parent);
         physics = new PhysicsComponent(parent);
+        // the physics component *must* share the transform instance of this object
         physics.setTransform(transform);
         this.collider = new ColliderComponent(this, colliderType);
         this.contactStateMap = new HashMap<>();
@@ -82,14 +98,23 @@ public class GameObject extends Component {
 
     //******** PUBLIC METHODS ********//
 
+    /**
+     * This GameObject's physics configuration.
+     */
     public PhysicsComponent physics() {
         return physics;
     }
 
+    /**
+     * This GameObject's collider configuration.
+     */
     public ColliderComponent collider() {
         return collider;
     }
 
+    /**
+     * @return true if this GameObject has been called to be destroyed.
+     */
     public boolean isDestroyed() {
         return isDestroyed;
     }
@@ -104,16 +129,11 @@ public class GameObject extends Component {
         System.out.println(this.toString() + " was destroyed");
     }
 
-    //******** PROTECTED METHODS ********//
-
-    protected void renderRelativeLine(PVector v) {
-        PVector o = globalPosition();
-        PVector p = o.copy().add(v);
-        game().line(o.x, o.y, p.x, p.y);
-    }
-
     //******** PACKAGE-LOCAL METHODS ********//
 
+    /**
+     * @return the mapping of other GameObjects to the contact state between them and this.
+     */
     Map<GameObject, ContactState> getContactStateMap() {
         return contactStateMap;
     }
@@ -134,10 +154,5 @@ public class GameObject extends Component {
         game().removeEvent(onCollisionEnter);
         game().removeEvent(onCollisionStay);
         game().removeEvent(onCollisionExit);
-    }
-
-    private void giveChildrenToParent() {
-        for (RelativeTransform c : children)
-            c.parent = parent;
     }
 }
