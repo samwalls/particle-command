@@ -39,5 +39,6 @@ public class MainComponent extends GameManager {
         background(0, 0, 0);
         // update, render
         updateAll();
+        System.out.println(frameRate);
     }
 }

@@ -28,6 +28,11 @@ public class EventManager implements EventEmitter, EventConsumer {
 
     public void emit(Event event) {
         cleanup();
+        // TODO it _seems_ as though the performance issues are proportional to the number of registered events, not sure
+//        int t = 0;
+//        for (List<Consumer<Event>> events : registeredEvents.values())
+//            t += events.size();
+//        System.out.println(t);
         for (Consumer<Event> consumer : registeredEvents.get(event.getClass()))
             consumer.accept(event);
     }

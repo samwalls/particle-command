@@ -27,7 +27,7 @@ public class Game extends GameObject {
     private float enemyTurretFireProbability = 0.1f;
 
     private int playerAmmunition = 10;
-    private int enemyAmmunition = 15;
+    private int enemyAmmunition = 13;
 
     private static final float PLAYER_AMMUNITION_INCREASE = 5;
     private static final float ENEMY_AMMUNITION_INCREASE = 7;
