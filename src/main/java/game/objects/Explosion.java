@@ -23,7 +23,7 @@ public class Explosion extends GameObject {
     /**
      * the amount of "power" (see power()) contributed towards outwards force in an explosion
      */
-    private static final float PRESSURE_COEFFICIENT = 0.2f;
+    private static final float PRESSURE_COEFFICIENT = 0.1f;
 
     private Color explosionColour;
 

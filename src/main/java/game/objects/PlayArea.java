@@ -16,7 +16,7 @@ public class PlayArea extends GameObject {
 
     private static final float HEIGHT_PADDING = 50f;
 
-    private static final Color atmosphereColour = new Color(30, 180, 255, 127);
+    private static final Color atmosphereColour = new Color(30, 180, 255, 80);
 
     public PlayArea() {
         // will not move

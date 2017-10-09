@@ -32,7 +32,7 @@ public class Projectile extends GameObject {
 
     protected Color projectileColour = new Color(255, 0, 0, 255);
 
-    private PlayArea playarea;
+    protected PlayArea playarea;
 
     private float gravity = 0.01f;
 
@@ -41,7 +41,7 @@ public class Projectile extends GameObject {
     private ArrayDeque<PVector> trailPositions = new ArrayDeque<>();
     private int trailFrameCounter = 0;
 
-    private Battery playerBattery;
+    protected Battery playerBattery;
 
     public Projectile(PlayArea playArea, Battery battery, ColliderType colliderType, float radius, float mass, float dk1, float dk2) {
         this.playarea = playArea;
@@ -89,8 +89,9 @@ public class Projectile extends GameObject {
             playerBattery.removeTurret((Turret)other);
         }
         // explode if the projectile hit something concrete
-        if (!other.collider().isTrigger())
+        if (!other.collider().isTrigger()) {
             triggerExplosion();
+        }
         // apply regular forces
         applyForces(other);
     }
@@ -132,7 +133,7 @@ public class Projectile extends GameObject {
         physics().applyForce(drag);
     }
 
-    private void renderParticle() {
+    protected void renderParticle() {
         game().pushMatrix();
         PVector p = globalPosition();
         float radius = collider.getBoundingBox().outerRadius();
@@ -143,7 +144,7 @@ public class Projectile extends GameObject {
         game().popMatrix();
     }
 
-    private void renderTrail() {
+    protected void renderTrail() {
         game().pushMatrix();
         PVector p = globalPosition();
         game().stroke(0);
@@ -164,20 +165,15 @@ public class Projectile extends GameObject {
             PVector a = null, b;
             float i = 0;
             float alpha = 255;
+            float speed = physics().getVelocity().mag();
             for (PVector trailPoint : trailPositions) {
                 b = trailPoint;
                 if (a != null) {
-                    PVector strokeColour = new PVector(
-                            projectileColour.getRed(),
-                            projectileColour.getGreen(),
-                            projectileColour.getBlue()
-                    );
-//                    strokeColour.mult(10f / i);
                     alpha /= 0.5 * i;
-                    game().stroke(strokeColour.x, strokeColour.y, strokeColour.z, alpha);
+                    game().stroke(projectileColour.getRGB(), alpha);
                     float radius = collider.outerRadius();
 //                    float trailWidth = 1.5f * radius * game().exp(-i / 100 * physics.getVelocity().mag());
-                    float trailWidth = (radius - physics().getVelocity().mag() * (i / (radius * radius)));
+                    float trailWidth = (radius - speed * (i / (radius * radius)));
                     game().strokeWeight(trailWidth >= 0 ? trailWidth : 0);
                     game().line(a.x, a.y, b.x, b.y);
                 }

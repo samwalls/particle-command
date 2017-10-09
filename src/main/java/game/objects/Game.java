@@ -26,14 +26,15 @@ public class Game extends GameObject {
     private int enemyTurretCount = 1;
     private float enemyTurretFireProbability = 0.1f;
 
-    private int playerAmmunition = 20;
-    private int enemyAmmunition = 30;
+    private int playerAmmunition = 10;
+    private int enemyAmmunition = 15;
 
-    private static final float PLAYER_AMMUNITION_INCREASE = 10;
-    private static final float ENEMY_AMMUNITION_INCREASE = 15;
-    private static final float ENEMY_FIRE_PROBABILITY_INCREASE = 0.005f;
+    private static final float PLAYER_AMMUNITION_INCREASE = 5;
+    private static final float ENEMY_AMMUNITION_INCREASE = 7;
+    // 1% more likely to fire per firing opportunity than before
+    private static final float ENEMY_FIRE_PROBABILITY_INCREASE = 0.01f;
     // i.e. increase the number of enemy turrets by 1 every 5 waves
-    private static final int ENEMY_TURRET_COUNT_INCREASE_WAVES = 5;
+    private static final int ENEMY_TURRET_COUNT_INCREASE_WAVES = 3;
     private static final int ENEMY_TURRET_COUNT_INCREASE = 1;
 
     // game objects making up the game
@@ -51,6 +52,11 @@ public class Game extends GameObject {
      * The player's current score.
      */
     private int score = 0;
+
+    /**
+     * Miscellaneous bonuses applied from evasions etc.
+     */
+    private int miscBonus = 0;
 
     /**
      * The player's score in the previous wave.
@@ -158,6 +164,23 @@ public class Game extends GameObject {
         return playing;
     }
 
+    public void addSideEvasionScore(boolean right, float y) {
+        miscBonus += sideEvasionScoreBonus;
+        float x = right ? game().width -20f : 20f;
+        new Toast("side evasion! + " + sideEvasionScoreBonus, (int)(game().frameRate * 1f), new PVector(x, y), 20, right ? game().RIGHT : game().LEFT);
+    }
+
+    public void addTopEvasionScore(float x) {
+        miscBonus += topEvasionScoreBonus;
+        float y = 40f;
+        new Toast("top evasion! + " + topEvasionScoreBonus, (int)(game().frameRate * 1f), new PVector(x, y), 20, game().CENTER);
+    }
+
+    public void addDirectHitScore(float x, float y) {
+        miscBonus += directHitScoreBonus;
+        new Toast("direct hit! + " + directHitScoreBonus, (int)(game().frameRate * 1f), new PVector(x, y), 20, game().CENTER);
+    }
+
     private boolean levelOver() {
         return enemyBattery.getAmmunition() <= 0 && enemyBattery.destroyedProjectiles() >= enemyAmmunition;
     }
@@ -171,6 +194,7 @@ public class Game extends GameObject {
         score += playerBattery.getAmmunition() * remainingAmmunitionScoreBonus;
         // remaining batteries award points
         score += playerBattery.size() * remainingBatteryScoreBonus;
+        score += miscBonus;
     }
 
     private void increaseDifficultyConfiguration() {
@@ -207,6 +231,7 @@ public class Game extends GameObject {
         starField = new StarField();
         setupBatteries();
         playing = false;
+        miscBonus = 0;
     }
 
     private void setupBatteries() {
@@ -272,21 +297,21 @@ public class Game extends GameObject {
         game().fill(0, 64 * game().sin(phase) + 191, 64 * game().sin(phase) + 191);
         game().text("Round " + wave + " Complete!", game().width / 2f, 100f);
         // render score stats
-        float middle = game().height / 2f;
+        float middle = game().height / 2f - 100f;
         game().textSize(40f);
         game().fill(0, 255, 255);
         game().text("score before round: " + scoreBefore, game().width / 2f, middle - 100f);
         game().text("--------------------", game().width / 2f, middle - 60f);
         game().text("extra turrets " + remainingTurretsBefore + " (x " + remainingBatteryScoreBonus + "): " + remainingTurretsBefore * remainingBatteryScoreBonus, game().width / 2f, middle - 20f);
         game().text("extra ammunition " + remainingAmmunitionBefore + " (x " + remainingAmmunitionScoreBonus + "): " + remainingAmmunitionBefore * remainingAmmunitionScoreBonus, game().width / 2f, middle + 20f);
-        float remaining = score - (scoreBefore + remainingTurretsBefore * remainingBatteryScoreBonus + remainingAmmunitionBefore * remainingAmmunitionScoreBonus);
+        int remaining = score - (scoreBefore + remainingTurretsBefore * remainingBatteryScoreBonus + remainingAmmunitionBefore * remainingAmmunitionScoreBonus);
         game().text("other bonuses: " + remaining, game().width / 2f, middle + 60f);
         game().text("--------------------", game().width / 2f, middle + 100f);
         game().text("current score: " + score, game().width / 2f, middle + 140f);
         // render help message
-        game().textSize(50f);
+        game().textSize(40f);
         game().fill(255, 255, 255);
-        game().text("press any button to move to the next round", game().width / 2f, game().height - 100f);
+        game().text("press any button to move to the next round", game().width / 2f, game().height - 150f);
         game().popStyle();
         game().popMatrix();
         infoScreenDelta++;
@@ -320,7 +345,7 @@ public class Game extends GameObject {
         game().textAlign(game().CENTER);
         game().textSize(60f);
         game().fill(255, 255, 255, 127);
-        game().text("score: " + score, game().width / 2f, 100f);
+        game().text("score: " + (score + miscBonus), game().width / 2f, 100f);
         game().popStyle();
         game().popMatrix();
     }

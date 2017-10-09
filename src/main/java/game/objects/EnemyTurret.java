@@ -46,9 +46,9 @@ public class EnemyTurret extends Turret {
             return;
         PVector p = position();
         // move back and forth accross the width
-        setPosition(new PVector(-game().sin(period()) * spreadWidth / 2f, p.y));
         rotationDelta++;
         if (fireDelta++ >= FIRE_PERIOD) {
+            setPosition(new PVector(game().random(-game().width / 2f + 20f, game().width / 2f - 20f), p.y));
             potentiallyFire();
             fireDelta = 0;
         }
@@ -69,7 +69,7 @@ public class EnemyTurret extends Turret {
             // remove ammunition reserve
             enemyBattery.deductAmmunition();
             // create and propel a projectile
-            EnemyProjectile p = new EnemyProjectile(playArea, playerBattery);
+            EnemyProjectile p = new EnemyProjectile(playArea, playerBattery, game);
             parent.addChild(p);
             enemyBattery.addProjectile(p);
             p.setPosition(position());

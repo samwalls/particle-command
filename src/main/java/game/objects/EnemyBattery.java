@@ -31,8 +31,6 @@ public class EnemyBattery extends GameObject {
             EnemyTurret turret = turrets.get(i);
             turret.setEnemyBattery(this);
             turret.setPosition(new PVector(0, -game().height / 2f - EnemyTurret.TURRET_HEIGHT / 2f));
-            // equally distribute the phase
-            // TODO
         }
     }
 
