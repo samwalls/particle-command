@@ -6,6 +6,7 @@ import processing.core.PVector;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Singleton to help manage global states in the implemented game.
@@ -47,8 +48,7 @@ public class GameManager extends PApplet {
         cleanup();
         game().emit(new UpdateEvent());
         contactResolver.resolveAll();
-        for (GameObject g : all())
-            g.physics().integrate();
+        all().forEach( g -> g.physics().integrate());
         renderAll();
     }
 
@@ -68,8 +68,9 @@ public class GameManager extends PApplet {
         eventManager.remove(consumer);
     }
 
-    public Iterable<GameObject> all() {
-        return gameObjects;
+    public Stream<GameObject> all() {
+        // any that have to be added in the next update will be instantly removed as well
+        return Stream.concat(gameObjects.stream(), gameObjectsToAdd.stream());
     }
 
     public void setRenderingLayers(List<String> layers) {

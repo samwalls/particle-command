@@ -7,13 +7,14 @@ import engine.common.physics.Contact;
 import engine.common.physics.ContactState;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static engine.common.component.GameManager.game;
 
 public class ContactResolver {
 
     public void resolveAll() {
-        for (GameObject g : game().all()) {
+        for (GameObject g : game().all().collect(Collectors.toList())) {
             resolveContacts(detectContacts(g));
             checkForCollisionExits(g);
         }
@@ -37,13 +38,13 @@ public class ContactResolver {
     private ArrayList<Contact> detectContacts(GameObject g) {
         // TODO - there are many more efficient ways of doing this, rather than looping O(n^2) style
         ArrayList<Contact> contacts = new ArrayList<>();
-        for (GameObject other : game().all()) {
-            if (other == g)
-                continue;
-            Contact[] detected = ColliderComponent.areContacting(g, other);
-            if (detected != null)
-                Collections.addAll(contacts, detected);
-        }
+        game().all().forEach( other -> {
+            if (other != g) {
+                Contact[] detected = ColliderComponent.areContacting(g, other);
+                if (detected != null)
+                    Collections.addAll(contacts, detected);
+            }
+        });
         return contacts;
     }
 
